@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -7,6 +8,8 @@ export default function HomePage({ products = [] }) {
   const heroVideo =
     process.env.NEXT_PUBLIC_HERO_VIDEO ||
     "https://videos.pexels.com/video-files/5319764/5319764-hd_1920_1080_25fps.mp4";
+
+  const router = useRouter();
 
   // Dummy Data for the Sticky Section
   const scrollSectionItems = [
@@ -154,12 +157,13 @@ export default function HomePage({ products = [] }) {
                 <div
                   key={item.id}
                   className="relative w-full aspect-[4/5] lg:h-[600px] group cursor-pointer overflow-hidden"
-                  onClick={() => (window.location.href = `/product/${item.id}`)}
+                  onClick={() => router.push(`/product/${item.id}`)}
                 >
                   {/* Full Image */}
                   <img
                     src={item.image}
                     alt={item.name}
+                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
 

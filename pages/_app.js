@@ -1,30 +1,11 @@
 import '../styles/globals.css';
 import { CartProvider } from '../context/CartContext';
 import Head from 'next/head';
-import CartSidebar from '../components/CartSidebar';
-import { useEffect } from 'react';
-import Lenis from 'lenis';
+import dynamic from 'next/dynamic';
+
+const CartSidebar = dynamic(() => import('../components/CartSidebar'), { ssr: false });
 
 export default function MyApp({ Component, pageProps }) {
-  // Initialize Lenis smooth scrolling
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smooth: true,
-    });
-
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
-
   // overlay click handler hides the sidebar
   const hideCart = () => {
     if (typeof window === 'undefined') return;
