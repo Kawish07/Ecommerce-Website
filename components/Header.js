@@ -9,6 +9,16 @@ export default function Header({ forceSolid = false }) {
   const [activeMenu, setActiveMenu] = useState(null); // 'NEW IN', 'MEN', 'WOMEN', 'ACCESSORIES', or null
   const [bump, setBump] = useState(false);
   const firstLoad = useRef(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [catalog, setCatalog] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchInputRef = useRef(null);
+
+  const searchResults = (searchQuery ? catalog.filter((p) => {
+    const q = searchQuery.toLowerCase();
+    return p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || p.desc?.toLowerCase().includes(q);
+  }) : catalog).slice(0, 8);
   const solid = forceSolid || scrolled;
   const router = useRouter();
 
@@ -155,6 +165,44 @@ export default function Header({ forceSolid = false }) {
     };
   }, []);
 
+  // Prefetch products for search once
+  useEffect(() => {
+    if (!showSearch || catalog.length > 0 || searchLoading) return;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        setSearchLoading(true);
+        const base = process.env.NEXT_PUBLIC_SITE_URL || '';
+        const res = await fetch(`${base}/api/products`);
+        if (!res.ok) throw new Error('Failed products');
+        const data = await res.json();
+        if (!cancelled) setCatalog(Array.isArray(data.products) ? data.products : []);
+      } catch (e) {
+        if (!cancelled) setCatalog([]);
+      } finally {
+        if (!cancelled) setSearchLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [showSearch, catalog.length, searchLoading]);
+
+  // Focus input when search opens
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [showSearch]);
+
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') setShowSearch(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   // Tiny bump animation when count changes (skip initial mount)
   useEffect(() => {
     if (firstLoad.current) {
@@ -282,7 +330,9 @@ export default function Header({ forceSolid = false }) {
                   <span>PKR</span>
                   <i className="fas fa-chevron-down"></i>
                 </div>
-                <button aria-label="search" className={`text-lg hover:text-gray-300 ${solid ? 'text-black' : 'text-white'}`}><i className="fas fa-search"></i></button>
+                <button aria-label="search" className={`text-lg hover:text-gray-300 ${solid ? 'text-black' : 'text-white'}`} onClick={() => setShowSearch(true)}>
+                  <i className="fas fa-search"></i>
+                </button>
                 <button aria-label="account" className={`text-lg hover:text-gray-300 ${solid ? 'text-black' : 'text-white'}`}><i className="fas fa-user"></i></button>
                 <button aria-label="cart" className="relative" onClick={() => { if (typeof window !== 'undefined') { const el = document.getElementById('cart-sidebar'); if (el) el.classList.remove('translate-x-full'); const overlay = document.getElementById('cart-overlay'); if (overlay) { overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.remove('opacity-0'),10); } } }}>
                   <i className={`fas fa-shopping-bag text-lg hover:text-gray-300 ${solid ? 'text-black' : 'text-white'}`}></i>
@@ -377,6 +427,63 @@ export default function Header({ forceSolid = false }) {
           </div>
         )}
       </header>
+
+      {/* Search overlay */}
+      {showSearch && (
+        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-start justify-center px-4 py-12" role="dialog" aria-modal="true">
+          <div className="absolute inset-0" onClick={() => setShowSearch(false)}></div>
+          <div className="relative w-full max-w-5xl bg-white rounded-lg shadow-2xl overflow-hidden">
+            <div className="flex items-center gap-3 px-6 py-4 border-b">
+              <i className="fas fa-search text-gray-500"></i>
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products or collections..."
+                className="flex-1 outline-none text-sm"
+              />
+              <button onClick={() => setShowSearch(false)} className="text-sm text-gray-600 hover:text-black">Close</button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+              <div className="lg:col-span-2 p-6 space-y-4 border-r">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold uppercase tracking-widest">Products</h4>
+                  {searchLoading && <span className="text-xs text-gray-500">Loading...</span>}
+                </div>
+                {searchResults.length === 0 && !searchLoading && (
+                  <div className="text-sm text-gray-500">No products found. Try a different keyword.</div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {searchResults.map((p) => (
+                    <Link key={p.id} href={`/product/${p.id}`} className="group flex gap-3 p-3 border border-gray-100 rounded hover:shadow">
+                      <div className="w-16 h-16 bg-gray-100 overflow-hidden flex-shrink-0">
+                        <img src={p.image} alt={p.name} className="w-full h-full object-cover transition group-hover:scale-105" loading="lazy" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate">{p.name}</p>
+                        <p className="text-[11px] text-gray-500 uppercase tracking-wide">{p.category || 'Collection'}</p>
+                        <p className="text-sm font-bold">Rs {Math.round(p.price || 0).toLocaleString()}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <h4 className="text-sm font-semibold uppercase tracking-widest">Collections</h4>
+                <div className="space-y-2 text-sm">
+                  <Link href="/collections/men" className="block text-gray-800 hover:text-black">Men</Link>
+                  <Link href="/collections/women" className="block text-gray-800 hover:text-black">Women</Link>
+                  <Link href="/collections/accessories" className="block text-gray-800 hover:text-black">Accessories</Link>
+                  <Link href="/collections/new" className="block text-gray-800 hover:text-black">New Arrivals</Link>
+                  <Link href="/products" className="block text-gray-800 hover:text-black">All Products</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

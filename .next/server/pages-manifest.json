@@ -3,7 +3,7 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/collections/[category]/[subcategory]": "pages/collections/[category]/[subcategory].js",
+  "/product/[id]": "pages/product/[id].js",
   "/api/products": "pages/api/products.js",
-  "/product/[id]": "pages/product/[id].js"
+  "/collections/[category]": "pages/collections/[category].js"
 }

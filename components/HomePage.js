@@ -65,6 +65,68 @@ export default function HomePage({ products = [] }) {
       },
     ];
 
+  // New arrivals (use first 8 real products, fallback to curated list)
+  const newArrivals = products.length > 0
+    ? products.slice(0, 8)
+    : [
+        {
+          id: 201,
+          name: "AeroLite Tee",
+          price: 5400,
+          image: "https://images.pexels.com/photos/179909/pexels-photo-179909.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "Featherweight, fast-dry fabric",
+        },
+        {
+          id: 202,
+          name: "Motion Flex Joggers",
+          price: 8800,
+          image: "https://images.pexels.com/photos/769749/pexels-photo-769749.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "4-way stretch with taper fit",
+        },
+        {
+          id: 203,
+          name: "Prime Seamless Set",
+          price: 14200,
+          image: "https://images.pexels.com/photos/3737657/pexels-photo-3737657.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "Supportive knit, zero seams",
+        },
+        {
+          id: 204,
+          name: "Velocity Shorts",
+          price: 6200,
+          image: "https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "Mesh-lined, sweat-ready",
+        },
+        {
+          id: 205,
+          name: "Reset Hoodie",
+          price: 13200,
+          image: "https://images.pexels.com/photos/7679721/pexels-photo-7679721.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "Soft loopback fleece",
+        },
+        {
+          id: 206,
+          name: "Circuit Tank",
+          price: 4100,
+          image: "https://images.pexels.com/photos/7679869/pexels-photo-7679869.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "Cool-touch micro mesh",
+        },
+        {
+          id: 207,
+          name: "Lift Pro Leggings",
+          price: 11500,
+          image: "https://images.pexels.com/photos/3735643/pexels-photo-3735643.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "High-rise sculpt waistband",
+        },
+        {
+          id: 208,
+          name: "Core Everyday Tee",
+          price: 4800,
+          image: "https://images.pexels.com/photos/432059/pexels-photo-432059.jpeg?auto=compress&cs=tinysrgb&w=800",
+          desc: "Cotton-modal ultra soft",
+        },
+      ];
+
   useEffect(() => {
     if (typeof window !== "undefined" && window.__addToCart == null) {
       // no-op: CartContext exposes helpers on mount
@@ -436,35 +498,53 @@ export default function HomePage({ products = [] }) {
           </div>
           <div
             id="new-arrivals-grid"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12"
           >
-            {products
-              .filter((p) => p.tag === "NEW DROP")
-              .slice(0, 4)
-              .map((p) => (
-                <div
-                  key={p.id}
-                  className="group relative cursor-pointer"
-                  onClick={() => (window.location.href = `/product/${p.id}`)}
-                >
-                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-gray-100 mb-4">
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm mb-1">{p.name}</h4>
-                    <p className="text-xs text-gray-500 mb-2">
-                      {p.description || p.desc || ""}
-                    </p>
+            {newArrivals.map((p) => (
+              <div
+                key={p.id}
+                className="group relative cursor-pointer border border-gray-100 hover:shadow-lg transition-shadow rounded-sm"
+                onClick={() => (window.location.href = `/product/${p.id}`)}
+              >
+                <div className="relative w-full aspect-[3/4] overflow-hidden bg-gray-50 mb-4">
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <span className="absolute top-3 left-3 bg-white text-[10px] font-bold tracking-widest px-2 py-1 uppercase shadow-sm">
+                    New
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (
+                        typeof window !== "undefined" &&
+                        typeof window.__addToCart === "function"
+                      ) {
+                        window.__addToCart({ ...p, quantity: p.quantity || 1 });
+                      }
+                    }}
+                    className="absolute bottom-3 left-3 right-3 bg-black text-white text-xs font-semibold py-2 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+                <div className="px-3 pb-4">
+                  <h4 className="font-bold text-sm mb-1 line-clamp-1">{p.name}</h4>
+                  <p className="text-xs text-gray-500 mb-2 line-clamp-2">
+                    {p.description || p.desc || "New-season performance gear"}
+                  </p>
+                  <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">
                       Rs {Math.round(p.price || 0).toLocaleString()}
                     </span>
+                    <span className="text-[11px] text-gray-500">Quick add +</span>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </section>
       </main>
