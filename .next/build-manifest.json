@@ -27,15 +27,25 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/collections/[category]": [
+    "/admin": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/collections/[category].js"
+      "static/chunks/pages/admin.js"
     ],
-    "/product/[id]": [
+    "/admin/guide": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/product/[id].js"
+      "static/chunks/pages/admin/guide.js"
+    ],
+    "/admin/orders": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/admin/orders.js"
+    ],
+    "/admin/products": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/admin/products.js"
     ]
   },
   "ampFirstPages": []
