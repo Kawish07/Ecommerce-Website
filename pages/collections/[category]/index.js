@@ -4,10 +4,9 @@ import Link from 'next/link';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 
-export default function CategoryPage() {
+export default function CategoryPage({ products = [], category }) {
   const router = useRouter();
-  const { category } = router.query;
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (category) {
@@ -15,8 +14,8 @@ export default function CategoryPage() {
     }
   }, [category]);
 
-  // Dummy products for the grid
-  const scrollSectionItems = [
+  // Use real products from API, fallback to dummy data if empty
+  const scrollSectionItems = products.length > 0 ? products : [
     {
       id: 201,
       name: "Elite Performance Tee",
@@ -273,8 +272,27 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  return {
-    props: { category: params.category },
-    revalidate: 3600, // ISR: Revalidate every hour
-  };
+  const base = process.env.API_BASE_URL || 'http://localhost:3000/api';
+  try {
+    const res = await fetch(`${base}/products?category=${params.category}`);
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) throw new Error('Non-JSON response');
+    const data = await res.json();
+    
+    return {
+      props: { 
+        products: data.products || [],
+        category: params.category 
+      },
+      revalidate: 3600, // ISR: Revalidate every hour
+    };
+  } catch (err) {
+    return {
+      props: { 
+        products: [],
+        category: params.category 
+      },
+      revalidate: 3600,
+    };
+  }
 }

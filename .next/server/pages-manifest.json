@@ -2,7 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/collections/[category]": "pages/collections/[category].js",
   "/": "pages/index.js",
-  "/collections/[category]/[subcategory]": "pages/collections/[category]/[subcategory].js"
+  "/collections/[category]/[subcategory]": "pages/collections/[category]/[subcategory].js",
+  "/api/products": "pages/api/products.js",
+  "/product/[id]": "pages/product/[id].js"
 }

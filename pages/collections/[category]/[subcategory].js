@@ -4,10 +4,9 @@ import Link from 'next/link';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 
-export default function CollectionPage() {
+export default function CollectionPage({ products = [], category, subcategory }) {
   const router = useRouter();
-  const { category, subcategory } = router.query;
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (category && subcategory) {
@@ -15,8 +14,8 @@ export default function CollectionPage() {
     }
   }, [category, subcategory]);
 
-  // Dummy products for grid section
-  const scrollSectionItems = [
+  // Use real products from API, fallback to dummy data if empty
+  const scrollSectionItems = products.length > 0 ? products : [
     {
       id: 1,
       name: "Performance Tee",
@@ -73,7 +72,6 @@ export default function CollectionPage() {
         image: "https://images.pexels.com/photos/5580207/pexels-photo-5580207.jpeg?auto=compress&cs=tinysrgb&w=800",
         desc: "Lightweight tech",
     },
-    // Extra items to show grid flow
     {
         id: 9,
         name: "Gym Bag",
@@ -284,8 +282,34 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  return {
-    props: { category: params.category, subcategory: params.subcategory },
-    revalidate: 3600, // ISR: Revalidate every hour
-  };
+  const base = process.env.API_BASE_URL || 'http://localhost:3000/api';
+  try {
+    const res = await fetch(`${base}/products`);
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) throw new Error('Non-JSON response');
+    const data = await res.json();
+    
+    // Filter products by category and subcategory
+    const filteredProducts = (data.products || []).filter(
+      (p) => p.category === params.category && p.subcategory === params.subcategory
+    );
+    
+    return {
+      props: { 
+        products: filteredProducts,
+        category: params.category, 
+        subcategory: params.subcategory 
+      },
+      revalidate: 3600, // ISR: Revalidate every hour
+    };
+  } catch (err) {
+    return {
+      props: { 
+        products: [],
+        category: params.category, 
+        subcategory: params.subcategory 
+      },
+      revalidate: 3600,
+    };
+  }
 }

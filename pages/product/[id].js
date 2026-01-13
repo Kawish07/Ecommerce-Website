@@ -3,27 +3,18 @@ import Link from 'next/link';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
-export default function ProductPage({ product }) {
+export default function ProductPage({ product, relatedProducts = [] }) {
   const [selectedSize, setSelectedSize] = useState('M');
   const [expandedSection, setExpandedSection] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(0);
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
-  const relatedProducts = [
-    {
-      id: 101,
-      name: 'Performance Tee',
-      price: 4500,
-      image: 'https://images.pexels.com/photos/4066293/pexels-photo-4066293.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tag: 'BACK IN STOCK',
-    },
-    {
-      id: 102,
-      name: 'Training Socks',
-      price: 1999,
-      image: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tag: 'BACK IN STOCK',
-    },
-  ];
+  // Get product images (use the images array if available, otherwise use main image)
+  const productImages = product?.images && product.images.length > 0 
+    ? product.images 
+    : product?.image 
+      ? [product.image] 
+      : ['https://images.pexels.com/photos/3755706/pexels-photo-3755706.jpeg?auto=compress&cs=tinysrgb&w=800'];
 
   if (!product) {
     return (
@@ -75,12 +66,24 @@ export default function ProductPage({ product }) {
         {/* Left Column: Gallery */}
         <div className="space-y-4">
           <div className="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-100">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <img 
+              src={productImages[selectedImage]} 
+              alt={product.name} 
+              className="w-full h-full object-cover" 
+            />
           </div>
           <div className="grid grid-cols-4 gap-3">
-            {[product.image, product.image, product.image].map((src, idx) => (
-              <div key={idx} className="aspect-[3/4] overflow-hidden rounded bg-gray-100">
-                <img src={src} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
+            {productImages.map((src, idx) => (
+              <div 
+                key={idx} 
+                className={`aspect-[3/4] overflow-hidden rounded bg-gray-100 cursor-pointer border-2 ${selectedImage === idx ? 'border-black' : 'border-transparent'}`}
+                onClick={() => setSelectedImage(idx)}
+              >
+                <img 
+                  src={src} 
+                  alt={`${product.name} ${idx + 1}`} 
+                  className="w-full h-full object-cover hover:scale-105 transition-transform" 
+                />
               </div>
             ))}
           </div>
@@ -145,19 +148,21 @@ export default function ProductPage({ product }) {
           </div>
 
           {/* Product Video */}
-          <div className="mt-8 rounded-lg overflow-hidden bg-gray-100 aspect-video">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-              poster="https://images.pexels.com/photos/1534126/pexels-photo-1534126.jpeg?auto=compress&cs=tinysrgb&w=800"
-            >
-              <source src="/videos/rightcoloumn.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
+          {product.video && (
+            <div className="mt-8 rounded-lg overflow-hidden bg-gray-100 aspect-video">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+                poster={product.image}
+              >
+                <source src={product.video} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          )}
         </div>
       </main>
 
@@ -240,8 +245,38 @@ export async function getStaticProps({ params }) {
       description: 'Premium performance wear crafted for training and lifestyle.',
     };
 
+    const product = found || fallbackProduct;
+    
+    // Get related products from the same category/subcategory, excluding current product
+    let relatedProducts = [];
+    if (product.category && product.subcategory) {
+      relatedProducts = (data.products || []).filter(
+        (p) => p.category === product.category && 
+               p.subcategory === product.subcategory && 
+               String(p.id) !== String(params.id)
+      ).slice(0, 4); // Get up to 4 related products
+    }
+    
+    // If no related products in same subcategory, get from same category
+    if (relatedProducts.length === 0 && product.category) {
+      relatedProducts = (data.products || []).filter(
+        (p) => p.category === product.category && 
+               String(p.id) !== String(params.id)
+      ).slice(0, 4);
+    }
+    
+    // If still no related products, get any products
+    if (relatedProducts.length === 0) {
+      relatedProducts = (data.products || []).filter(
+        (p) => String(p.id) !== String(params.id)
+      ).slice(0, 4);
+    }
+
     return { 
-      props: { product: found || fallbackProduct },
+      props: { 
+        product,
+        relatedProducts 
+      },
       revalidate: 3600 // ISR: Revalidate every hour
     };
   } catch (err) {
@@ -253,7 +288,10 @@ export async function getStaticProps({ params }) {
       description: 'Premium performance wear crafted for training and lifestyle.',
     };
     return { 
-      props: { product: fallbackProduct },
+      props: { 
+        product: fallbackProduct,
+        relatedProducts: []
+      },
       revalidate: 3600 // ISR: Revalidate every hour
     };
   }

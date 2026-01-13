@@ -11,57 +11,59 @@ export default function HomePage({ products = [] }) {
 
   const router = useRouter();
 
-  // Dummy Data for the Sticky Section
-  const scrollSectionItems = [
-    {
-      id: 101,
-      name: "Seamless Gym Tee",
-      price: 4500,
-      image:
-        "https://images.pexels.com/photos/4066293/pexels-photo-4066293.jpeg?auto=compress&cs=tinysrgb&w=800",
-      desc: "Ultimate comfort fit",
-    },
-    {
-      id: 102,
-      name: "Flex Pro Shorts",
-      price: 3800,
-      image:
-        "https://media.istockphoto.com/id/854321536/photo/look-at-this-gorgeous-dress.jpg?s=612x612&w=0&k=20&c=UyxEiEddYEFQPAoopwYs-_8xJ5vp0vKE0Sl3GnrQpK8=",
-      desc: "4-way stretch fabric",
-    },
-    {
-      id: 103,
-      name: "Level Up Hoodie",
-      price: 27200,
-      image:
-        "https://media.istockphoto.com/id/955641488/photo/clothes-shop-costume-dress-fashion-store-style-concept.jpg?s=612x612&w=0&k=20&c=ZouECh5-XOCuBzvKBQfxgyw0RIGEUg9u5F0sJiZV86s=",
-      desc: "Tawny Port collection",
-    },
-    {
-      id: 104,
-      name: "Neotech Vest",
-      price: 15000,
-      image:
-        "https://cdn.pixabay.com/photo/2020/03/03/12/52/girl-4898696_1280.jpg",
-      desc: "Breathable mesh",
-    },
-    {
-      id: 105,
-      name: "Power Joggers",
-      price: 23000,
-      image:
-        "https://cdn.pixabay.com/photo/2015/09/02/11/01/woman-918267_1280.jpg",
-      desc: "High waist support",
-    },
-    {
-      id: 106,
-      name: "Performance Tee",
-      price: 5000,
-      image:
-        "https://cdn.pixabay.com/photo/2018/07/22/21/59/fashion-3555650_1280.jpg",
-      desc: "Moisture wicking",
-    },
-  ];
+  // Use real products for the sticky section (first 6)
+  const scrollSectionItems = products.slice(0, 6).length > 0 
+    ? products.slice(0, 6) 
+    : [
+      {
+        id: 101,
+        name: "Seamless Gym Tee",
+        price: 4500,
+        image:
+          "https://images.pexels.com/photos/4066293/pexels-photo-4066293.jpeg?auto=compress&cs=tinysrgb&w=800",
+        desc: "Ultimate comfort fit",
+      },
+      {
+        id: 102,
+        name: "Flex Pro Shorts",
+        price: 3800,
+        image:
+          "https://media.istockphoto.com/id/854321536/photo/look-at-this-gorgeous-dress.jpg?s=612x612&w=0&k=20&c=UyxEiEddYEFQPAoopwYs-_8xJ5vp0vKE0Sl3GnrQpK8=",
+        desc: "4-way stretch fabric",
+      },
+      {
+        id: 103,
+        name: "Level Up Hoodie",
+        price: 27200,
+        image:
+          "https://media.istockphoto.com/id/955641488/photo/clothes-shop-costume-dress-fashion-store-style-concept.jpg?s=612x612&w=0&k=20&c=ZouECh5-XOCuBzvKBQfxgyw0RIGEUg9u5F0sJiZV86s=",
+        desc: "Tawny Port collection",
+      },
+      {
+        id: 104,
+        name: "Neotech Vest",
+        price: 15000,
+        image:
+          "https://cdn.pixabay.com/photo/2020/03/03/12/52/girl-4898696_1280.jpg",
+        desc: "Breathable mesh",
+      },
+      {
+        id: 105,
+        name: "Power Joggers",
+        price: 23000,
+        image:
+          "https://cdn.pixabay.com/photo/2015/09/02/11/01/woman-918267_1280.jpg",
+        desc: "High waist support",
+      },
+      {
+        id: 106,
+        name: "Performance Tee",
+        price: 5000,
+        image:
+          "https://cdn.pixabay.com/photo/2018/07/22/21/59/fashion-3555650_1280.jpg",
+        desc: "Moisture wicking",
+      },
+    ];
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.__addToCart == null) {

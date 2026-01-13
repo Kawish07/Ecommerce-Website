@@ -5,6 +5,8 @@ import { useState } from 'react';
 export default function CheckoutPage() {
   const { cart, clear } = useCart();
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [orderData, setOrderData] = useState(null);
   
   // State for form inputs
   const [formData, setFormData] = useState({
@@ -27,9 +29,14 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
-    // Basic Validation
-    if (!formData.email || !formData.address) {
+    // Basic Validation - check all required fields
+    if (!formData.email || !formData.firstName || !formData.lastName || !formData.address || !formData.city || !formData.postalCode || !formData.phone) {
       alert('Please fill in all required fields.');
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert('Your cart is empty. Please add products before checkout.');
       return;
     }
 
@@ -50,18 +57,48 @@ export default function CheckoutPage() {
       const data = await res.json();
       
       if (data.ok) {
+        // Store order data for modal
+        const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        const total = subtotal + SHIPPING_COST;
+        
+        setOrderData({
+          items: cart,
+          shippingAddress: formData,
+          subtotal,
+          total,
+          orderDate: new Date().toLocaleDateString()
+        });
+        
+        // Show success modal
+        setShowSuccessModal(true);
+        
+        // Clear cart and form
         clear();
-        alert('Order placed successfully via Cash on Delivery!');
-        window.location.href = '/';
+        setFormData({
+          email: '',
+          firstName: '',
+          lastName: '',
+          address: '',
+          city: '',
+          country: 'Pakistan',
+          postalCode: '',
+          phone: ''
+        });
       } else {
         alert('Checkout failed. Please try again.');
       }
     } catch (error) {
       console.error(error);
-      alert('An error occurred.');
+      alert('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    setOrderData(null);
+    window.location.href = '/';
   };
 
   // Calculate Totals
@@ -106,28 +143,36 @@ export default function CheckoutPage() {
                   name="firstName"
                   placeholder="First name" 
                   className="w-full p-3 border border-gray-300 focus:border-black focus:outline-none"
+                  value={formData.firstName}
                   onChange={handleInputChange}
+                  required
                 />
                 <input 
                   type="text" 
                   name="lastName"
                   placeholder="Last name" 
                   className="w-full p-3 border border-gray-300 focus:border-black focus:outline-none"
+                  value={formData.lastName}
                   onChange={handleInputChange}
+                  required
                 />
                 <input 
                   type="text" 
                   name="address"
                   placeholder="Address" 
                   className="col-span-2 w-full p-3 border border-gray-300 focus:border-black focus:outline-none"
+                  value={formData.address}
                   onChange={handleInputChange}
+                  required
                 />
                 <input 
                   type="text" 
                   name="city"
                   placeholder="City" 
                   className="w-full p-3 border border-gray-300 focus:border-black focus:outline-none"
+                  value={formData.city}
                   onChange={handleInputChange}
+                  required
                 />
                 <input 
                   type="text" 
@@ -142,14 +187,18 @@ export default function CheckoutPage() {
                   name="postalCode"
                   placeholder="Postal code" 
                   className="w-full p-3 border border-gray-300 focus:border-black focus:outline-none"
+                  value={formData.postalCode}
                   onChange={handleInputChange}
+                  required
                 />
                 <input 
                   type="tel" 
                   name="phone"
                   placeholder="Phone" 
                   className="w-full p-3 border border-gray-300 focus:border-black focus:outline-none"
+                  value={formData.phone}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </section>
@@ -195,21 +244,33 @@ export default function CheckoutPage() {
             <div className="sticky top-24 border border-gray-200 rounded-md overflow-hidden">
               
               <div className="p-6 bg-gray-50 border-b border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                   <div className="w-20 h-20 bg-gray-200 rounded overflow-hidden">
-                     {/* Placeholder for Product Image */}
-                     <img 
-                       src={cart[0]?.image || "https://via.placeholder.com/150"} 
-                       alt="Product" 
-                       className="w-full h-full object-cover"
-                     />
-                   </div>
-                   <div className="flex-1 ml-4">
-                     <p className="font-semibold text-sm">Level Up Joggers - Tawny Port M</p>
-                     <p className="text-gray-500 text-xs mt-1">Rs {cart[0]?.price?.toLocaleString()}</p>
-                     <p className="text-gray-900 text-sm mt-1">Qty: {cart[0]?.quantity}</p>
-                   </div>
-                </div>
+                {cart.length > 0 ? (
+                  <>
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="w-20 h-20 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                        {/* Product Image */}
+                        <img 
+                          src={cart[0]?.image || "https://via.placeholder.com/150"} 
+                          alt={cart[0]?.name || "Product"} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = "https://via.placeholder.com/150";
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 ml-4">
+                        <p className="font-semibold text-sm">{cart[0]?.name || 'Product'}</p>
+                        <p className="text-gray-500 text-xs mt-1">Rs {cart[0]?.price?.toLocaleString() || '0'}</p>
+                        <p className="text-gray-900 text-sm mt-1">Qty: {cart[0]?.quantity || 1}</p>
+                        {cart.length > 1 && <p className="text-gray-500 text-xs mt-1">+{cart.length - 1} more item(s)</p>}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-6">
+                    <p className="text-gray-500">Your cart is empty</p>
+                  </div>
+                )}
 
                 {/* Discount Code */}
                 <div className="flex gap-2">
@@ -256,6 +317,73 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
+
+      {/* SUCCESS MODAL */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-8">
+            {/* Checkmark Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Complete!</h2>
+              <p className="text-gray-600 mb-6">Your order has been placed successfully.</p>
+
+              {/* Order Details */}
+              <div className="bg-gray-50 p-4 rounded-lg mb-6 text-left">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Order Date:</span>
+                    <span className="font-semibold">{orderData?.orderDate}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Items:</span>
+                    <span className="font-semibold">{orderData?.items?.length || 0}</span>
+                  </div>
+                  <div className="border-t border-gray-200 pt-3 flex justify-between text-sm">
+                    <span className="text-gray-600">Total Amount:</span>
+                    <span className="font-bold text-lg">Rs {orderData?.total?.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Delivery To:</span>
+                    <span className="font-semibold text-right">{orderData?.shippingAddress?.city}, {orderData?.shippingAddress?.country}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Message */}
+              <p className="text-sm text-gray-600 mb-6">
+                Thank you for your order! You will receive a confirmation email shortly. Your order will be delivered within 3-4 business days via Express Courier.
+              </p>
+
+              {/* Button */}
+              <button
+                onClick={handleCloseModal}
+                className="w-full bg-black text-white py-3 font-medium rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

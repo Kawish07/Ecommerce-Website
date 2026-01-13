@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 
 export default function Header({ forceSolid = false }) {
@@ -7,6 +7,8 @@ export default function Header({ forceSolid = false }) {
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null); // 'NEW IN', 'MEN', 'WOMEN', 'ACCESSORIES', or null
+  const [bump, setBump] = useState(false);
+  const firstLoad = useRef(true);
   const solid = forceSolid || scrolled;
   const router = useRouter();
 
@@ -153,6 +155,18 @@ export default function Header({ forceSolid = false }) {
     };
   }, []);
 
+  // Tiny bump animation when count changes (skip initial mount)
+  useEffect(() => {
+    if (firstLoad.current) {
+      firstLoad.current = false;
+      return;
+    }
+    if (count <= 0) return;
+    setBump(true);
+    const t = setTimeout(() => setBump(false), 350);
+    return () => clearTimeout(t);
+  }, [count]);
+
   // Scroll Logic
   useEffect(() => {
     function onScroll() {
@@ -197,6 +211,15 @@ export default function Header({ forceSolid = false }) {
         .animate-slide-down {
           animation: slideDown 0.2s ease-out forwards;
         }
+        @keyframes cartBump {
+          0% { transform: scale(1); }
+          25% { transform: scale(1.18); }
+          50% { transform: scale(0.92); }
+          100% { transform: scale(1); }
+        }
+        .animate-cart-bump {
+          animation: cartBump 0.35s ease-out;
+        }
       `}</style>
       
       <header 
@@ -206,7 +229,7 @@ export default function Header({ forceSolid = false }) {
         {/* Top promo bar */}
         <div className={`${solid ? 'bg-white text-black' : 'bg-black bg-opacity-60 text-white'} text-xs py-1 transition-colors duration-200`}>
           <div className="max-w-[1600px] mx-auto px-4 lg:px-8 flex justify-between items-center">
-            <div>20% OFF ON YOUR FIRST ORDER, USE CODE: WELCOME20 &nbsp; <span className={`ml-2 border-l ${solid ? 'border-black' : 'border-white'} pl-2`}><a href="/" className={`underline ${solid ? 'text-black' : 'text-white'}`}>SHOP NOW &gt;</a></span></div>
+            <div>20% OFF ON YOUR FIRST ORDER, USE CODE: WELCOME20 &nbsp; <span className={`ml-2 border-l ${solid ? 'border-black' : 'border-white'} pl-2`}><Link href="/" className={`underline ${solid ? 'text-black' : 'text-white'}`}>SHOP NOW &gt;</Link></span></div>
             <div className={`text-right ${solid ? 'text-black' : 'text-white'}`}>ENGLISH &nbsp; <span className="mx-2">|</span> PAKISTAN</div>
           </div>
         </div>
@@ -249,9 +272,9 @@ export default function Header({ forceSolid = false }) {
               </div>
 
               <div className="flex-1 md:flex-none text-center">
-                <a href="/" className={`text-3xl font-display font-bold tracking-tighter uppercase cursor-pointer hover:opacity-80 transition-opacity inline-block ${mounted && solid ? 'text-black' : 'text-white'}`}>
+                <Link href="/" className={`text-3xl font-display font-bold tracking-tighter uppercase cursor-pointer hover:opacity-80 transition-opacity inline-block ${mounted && solid ? 'text-black' : 'text-white'}`}>
                   Squatwolf<span className={`text-xs align-top ${mounted && solid ? 'text-black' : 'text-white'}`}>®</span>
-                </a>
+                </Link>
               </div>
 
               <div className="flex items-center space-x-6">
@@ -263,7 +286,11 @@ export default function Header({ forceSolid = false }) {
                 <button aria-label="account" className={`text-lg hover:text-gray-300 ${solid ? 'text-black' : 'text-white'}`}><i className="fas fa-user"></i></button>
                 <button aria-label="cart" className="relative" onClick={() => { if (typeof window !== 'undefined') { const el = document.getElementById('cart-sidebar'); if (el) el.classList.remove('translate-x-full'); const overlay = document.getElementById('cart-overlay'); if (overlay) { overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.remove('opacity-0'),10); } } }}>
                   <i className={`fas fa-shopping-bag text-lg hover:text-gray-300 ${solid ? 'text-black' : 'text-white'}`}></i>
-                  {count>0 && <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">{count}</span>}
+                  {count>0 && (
+                    <span className={`absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full ${bump ? 'animate-cart-bump' : ''}`}>
+                      {count}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
