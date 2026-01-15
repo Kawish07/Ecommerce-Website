@@ -205,47 +205,48 @@ export default function Header({ forceSolid = false }) {
       `}</style>
       
       <header 
-        className={`w-full fixed top-0 left-0 z-50 transition-all duration-300 ${solid ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}
+        className={`w-full fixed top-0 left-0 z-50 transition-all duration-500 ${solid ? 'bg-black/95 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border-b border-white/10' : 'bg-transparent'}`}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Promo Bar */}
-        <div className={`${solid ? 'bg-gray-900 text-white' : 'bg-black/80 backdrop-blur text-white'} text-[10px] font-bold tracking-[0.15em] uppercase py-1.5`}>
-          <div className="max-w-[1600px] mx-auto px-4 lg:px-8 flex justify-center items-center">
-            <span className="hover:opacity-80 cursor-pointer">Free Shipping on Orders Over PKR 5,000</span>
+        {/* Promo Bar - Enhanced */}
+        <div className={`${solid ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white border-b border-white/5' : 'bg-black/90 backdrop-blur text-white'} text-[10px] font-black tracking-[0.2em] uppercase py-2 relative overflow-hidden group`}>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+          <div className="max-w-[1600px] mx-auto px-4 lg:px-8 flex justify-center items-center relative z-10">
+            <span className="hover:text-gray-300 cursor-pointer transition-colors duration-300">Free Shipping on Orders Over PKR 5,000</span>
           </div>
         </div>
 
-        {/* Main Nav */}
+        {/* Main Nav - Enhanced Dark Theme */}
         <div className="w-full">
           <div className="max-w-[1600px] mx-auto px-4 lg:px-8">
-            <div className={`flex items-center h-16 md:h-20 justify-between transition-colors duration-300 ${solid ? 'text-black' : 'text-white'}`}>
+            <div className={`flex items-center h-16 md:h-20 justify-between transition-all duration-500 ${solid ? 'text-white' : 'text-white'}`}>
               
-              <div className="hidden md:flex items-center space-x-8 text-[11px] font-bold tracking-[0.2em] uppercase">
+              <div className="hidden md:flex items-center space-x-8 text-[11px] font-black tracking-[0.25em] uppercase">
                 {['NEW IN', 'MEN', 'WOMEN', 'ACCESSORIES'].map((menu) => (
                   <div key={menu} className="relative group cursor-pointer h-full flex items-center" onMouseEnter={() => setActiveMenu(menu)}>
-                    <span className={`transition-colors duration-300 ${activeMenu === menu ? 'text-black' : solid ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-200'}`}>
+                    <span className={`transition-all duration-300 relative group-hover:text-gray-300 ${activeMenu === menu ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'text-white/90'}`}>
                       {menu}
+                      <span className={`absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-white to-gray-400 transform origin-left transition-transform duration-300 ${activeMenu === menu ? 'scale-x-100' : 'scale-x-0'}`}></span>
                     </span>
-                    <span className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full transition-all duration-300 ${activeMenu === menu ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[-10px]'}`}></span>
                   </div>
                 ))}
               </div>
 
               <div className="flex-1 md:flex-none text-center">
-                <Link href="/" className={`text-3xl md:text-4xl font-black tracking-tighter uppercase leading-none ${mounted && solid ? 'text-black' : 'text-white'}`}>
-                  Squatwolf<span className={`text-[10px] md:text-xs align-top ml-1 font-normal ${mounted && solid ? 'text-black' : 'text-white'}`}>®</span>
+                <Link href="/" className="text-3xl md:text-4xl font-black tracking-tighter uppercase leading-none text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all duration-300">
+                  Squatwolf<span className="text-[10px] md:text-xs align-top ml-1 font-normal text-white/80">®</span>
                 </Link>
               </div>
 
-              <div className="flex items-center space-x-5 text-sm">
-                <button aria-label="search" className={`hover:opacity-70 transition-opacity ${solid ? 'text-black' : 'text-white'}`} onClick={() => setShowSearch(true)}>
+              <div className="flex items-center space-x-6 text-base">
+                <button aria-label="search" className="text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" onClick={() => setShowSearch(true)}>
                   <i className="fas fa-search"></i>
                 </button>
-                <button aria-label="account" className={`hover:opacity-70 transition-opacity ${solid ? 'text-black' : 'text-white'}`}><i className="fas fa-user"></i></button>
-                <button aria-label="cart" className="relative hover:opacity-70 transition-opacity" onClick={() => { if (typeof window !== 'undefined') { const el = document.getElementById('cart-sidebar'); if (el) el.classList.remove('translate-x-full'); const overlay = document.getElementById('cart-overlay'); if (overlay) { overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.remove('opacity-0'),10); } } }}>
-                  <i className={`fas fa-shopping-bag ${solid ? 'text-black' : 'text-white'}`}></i>
+                <button aria-label="account" className="text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"><i className="fas fa-user"></i></button>
+                <button aria-label="cart" className="relative text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" onClick={() => { if (typeof window !== 'undefined') { const el = document.getElementById('cart-sidebar'); if (el) el.classList.remove('translate-x-full'); const overlay = document.getElementById('cart-overlay'); if (overlay) { overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.remove('opacity-0'),10); } } }}>
+                  <i className="fas fa-shopping-bag"></i>
                   {count>0 && (
-                    <span className={`absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[9px] w-4 h-4 flex items-center justify-center font-bold ${bump ? 'animate-cart-bump' : ''}`}>
+                    <span className="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 to-red-700 text-white text-[9px] w-5 h-5 flex items-center justify-center font-black rounded-full shadow-lg shadow-red-500/50 animate-cart-bump">
                       {count}
                     </span>
                   )}
