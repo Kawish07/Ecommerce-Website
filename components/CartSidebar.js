@@ -18,16 +18,7 @@ export default function CartSidebar() {
   const itemCount = (cart || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   return (
-    <aside className="w-full bg-black text-white h-full flex flex-col shadow-2xl">
-      {/* Header with gradient border */}
-      <div className="relative">
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"></div>
-        <div className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-black text-lg sm:text-xl tracking-tight uppercase">Shopping Cart</h3>
-              <p className="text-[10px] sm:text-xs text-gray-400 mt-1 font-medium tracking-wide">{itemCount} {itemCount === 1 ? 'item' : 'items'} in your bag</p>
-            </div>
+    <aside className="w-full bg-black text-white h-full flex flex-col shadow-2xl">\n      {/* Header with gradient border */}\n      <div className="relative">\n        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"></div>\n        <div className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-800">\n          <div className="flex items-center justify-between">\n            <div>\n              <h3 className="font-black text-lg sm:text-xl tracking-tight uppercase">Shopping Cart</h3>\n              <p className="text-[10px] sm:text-xs text-gray-400 mt-1 font-medium tracking-wide">{itemCount} {itemCount === 1 ? 'item' : 'items'} in your bag</p>\n            </div>
             <button 
               aria-label="close cart" 
               onClick={close} 

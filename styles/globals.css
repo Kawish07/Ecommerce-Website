@@ -167,30 +167,3 @@ main { margin-top: 0; }
   .split-section .left-col { max-height: none; overflow: visible; }
   .split-section .right-video { position: static; top: auto; }
 }
-
-/* Global scrollbar styling to match the dark neon theme */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #ef4444 rgba(255, 255, 255, 0.06);
-}
-
-*::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-*::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 999px;
-}
-
-*::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: linear-gradient(135deg, #f43f5e, #ef4444);
-  border: 2px solid rgba(0, 0, 0, 0.35);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #fb7185, #f87171);
-}

@@ -17,12 +17,13 @@ export default function Header({ forceSolid = false }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(null);
 
+  const router = useRouter();
+
   const searchResults = (searchQuery ? catalog.filter((p) => {
     const q = searchQuery.toLowerCase();
     return p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || p.desc?.toLowerCase().includes(q);
   }) : catalog).slice(0, 8);
   const solid = forceSolid || scrolled;
-  const router = useRouter();
 
   const linkToSubcategoryMap = {
     't - shirts': 't-shirts', 'hoodies & jackets': 'hoodies-jackets', 'joggers': 'joggers', 'shorts': 'shorts', 'tanks': 'tanks',
@@ -44,14 +45,14 @@ export default function Header({ forceSolid = false }) {
       media: [
         {
           type: 'video',
-          src: 'https://videos.pexels.com/video-files/6129508/6129508-hd_1920_1080_30fps.mp4', // Urban runner
+          src: 'https://videos.pexels.com/video-files/6129508/6129508-hd_1920_1080_30fps.mp4', 
           poster: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&w=600',
           label: 'URBAN RUN',
           tag: 'NEW SEASON'
         },
         {
           type: 'image',
-          src: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=800', // Woman gym dark
+          src: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=800', 
           label: 'TRAINING',
           tag: 'HIGHLIGHT'
         }
@@ -66,14 +67,14 @@ export default function Header({ forceSolid = false }) {
       media: [
         {
           type: 'video',
-          src: 'https://videos.pexels.com/video-files/5309406/5309406-hd_1920_1080_25fps.mp4', // Man pushup
+          src: 'https://videos.pexels.com/video-files/5309406/5309406-hd_1920_1080_25fps.mp4', 
           poster: 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=600',
           label: 'PERFORMANCE',
           tag: 'GYM ESSENTIALS'
         },
         {
           type: 'image',
-          src: 'https://images.pexels.com/photos/1587008/pexels-photo-1587008.jpeg?auto=compress&cs=tinysrgb&w=800', // Dark moody man
+          src: 'https://images.pexels.com/photos/1587008/pexels-photo-1587008.jpeg?auto=compress&cs=tinysrgb&w=800', 
           label: 'STREET',
           tag: 'NEW ARRIVAL'
         }
@@ -88,7 +89,7 @@ export default function Header({ forceSolid = false }) {
       media: [
         {
           type: 'video',
-          src: 'https://videos.pexels.com/video-files/5834751/5834751-hd_1920_1080_24fps.mp4', // Yoga flow
+          src: 'https://videos.pexels.com/video-files/5834751/5834751-hd_1920_1080_24fps.mp4', 
           poster: 'https://images.pexels.com/photos/4462782/pexels-photo-4462782.jpeg?auto=compress&cs=tinysrgb&w=600',
           label: 'FLOW',
           tag: 'YOGA'
@@ -120,7 +121,7 @@ export default function Header({ forceSolid = false }) {
     }
   };
 
-  // Logic Hooks (Same as before)
+  // Logic Hooks
   useEffect(() => {
     function updateCount() {
       try {
@@ -162,10 +163,22 @@ export default function Header({ forceSolid = false }) {
   }, [showSearch]);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setShowSearch(false); };
+    const onKey = (e) => { if (e.key === 'Escape') { setShowSearch(false); setMobileMenuOpen(false); } };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  // FIX: Prevent scrolling body when mobile menu or search is open
+  useEffect(() => {
+    if (mobileMenuOpen || showSearch) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen, showSearch]);
 
   useEffect(() => {
     if (firstLoad.current) { firstLoad.current = false; return; }
@@ -206,8 +219,9 @@ export default function Header({ forceSolid = false }) {
         .custom-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
       `}</style>
       
+      {/* ================= HEADER ================= */}
       <header 
-        className={`w-full fixed top-0 left-0 z-50 transition-all duration-500 ${solid ? 'bg-black/95 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border-b border-white/10' : 'bg-transparent'}`}
+        className={`w-full fixed top-0 left-0 z-[9999] transition-all duration-500 ${solid ? 'bg-black/95 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border-b border-white/10' : 'bg-transparent'}`}
         onMouseLeave={handleMouseLeave}
       >
         {/* Promo Bar - Enhanced */}
@@ -225,7 +239,7 @@ export default function Header({ forceSolid = false }) {
               
               {/* Mobile Menu Toggle */}
               <button 
-                className="md:hidden text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 text-xl z-[1000] relative"
+                className="md:hidden text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 text-xl relative"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"
               >
@@ -263,82 +277,6 @@ export default function Header({ forceSolid = false }) {
                   )}
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ================= MOBILE MENU ================= */}
-        <div className={`md:hidden fixed inset-0 top-0 left-0 right-0 bottom-0 bg-black/95 backdrop-blur-lg z-[999] transition-all duration-500 ${mobileMenuOpen ? 'translate-x-0 opacity-100 pointer-events-auto visible' : 'translate-x-full opacity-0 pointer-events-none invisible'}`}>
-          <div className="h-full overflow-y-auto pt-20 px-6 pb-8">
-            {/* Mobile Search */}
-            <div className="mb-8 relative">
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 transition-colors"
-                onClick={() => { setShowSearch(true); setMobileMenuOpen(false); }}
-              />
-              <i className="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            </div>
-
-            {/* Mobile Menu Items */}
-            <div className="space-y-2">
-              {['NEW IN', 'MEN', 'WOMEN', 'ACCESSORIES'].map((menu) => (
-                <div key={menu} className="border-b border-white/10">
-                  <button
-                    onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === menu ? null : menu)}
-                    className="w-full flex items-center justify-between py-4 text-left text-sm font-black tracking-[0.2em] uppercase text-white hover:text-gray-300 transition-colors"
-                  >
-                    <span>{menu}</span>
-                    <i className={`fas fa-chevron-down transition-transform duration-300 ${mobileSubmenuOpen === menu ? 'rotate-180' : ''}`}></i>
-                  </button>
-                  
-                  {/* Mobile Submenu */}
-                  <div className={`overflow-hidden transition-all duration-300 ${mobileSubmenuOpen === menu ? 'max-h-[500px] pb-4' : 'max-h-0'}`}>
-                    <div className="space-y-4 pl-4">
-                      {menuContent[menu]?.columns.map((col, idx) => (
-                        <div key={idx}>
-                          <h4 className="text-[9px] font-black text-gray-500 uppercase tracking-[0.25em] mb-2">
-                            {col.title}
-                          </h4>
-                          <ul className="space-y-2">
-                            {col.links.map((link, lIdx) => {
-                              const subcategorySlug = linkToSubcategoryMap[link.toLowerCase()] || link.toLowerCase().replace(/ /g, '-').replace(/[()]/g, '');
-                              return (
-                                <li key={lIdx}>
-                                  <Link 
-                                    href={`/collections/${menu.toLowerCase().replace(/ /g, '-')}/${subcategorySlug}`}
-                                    className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                  >
-                                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-                                    {link}
-                                  </Link>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      ))}
-                      <Link 
-                        href={`/collections/${menu.toLowerCase().replace(/ /g, '-')}`}
-                        className="inline-block text-[10px] font-black uppercase tracking-widest text-red-500 border-b border-red-500 pb-0.5 hover:text-red-400 hover:border-red-400 transition-all mt-3"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        View All {menu}
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile Account Link */}
-            <div className="mt-8 pt-6 border-t border-white/10">
-              <button className="w-full flex items-center gap-3 text-sm font-semibold text-white hover:text-gray-300 transition-colors py-3">
-                <i className="fas fa-user"></i>
-                <span>My Account</span>
-              </button>
             </div>
           </div>
         </div>
@@ -444,9 +382,95 @@ export default function Header({ forceSolid = false }) {
         )}
       </header>
 
+      {/* ================= MOBILE MENU (Moved OUTSIDE Header) ================= */}
+      {/* FIX: Placed outside <header> so it has independent stacking context & Z-Index */}
+      <div className={`md:hidden fixed inset-0 top-0 left-0 right-0 bottom-0 bg-black/95 backdrop-blur-lg z-[999999999] transition-all duration-500 ${mobileMenuOpen ? 'translate-x-0 opacity-100 pointer-events-auto visible' : 'translate-x-full opacity-0 pointer-events-none invisible'}`}>
+        <div className="h-full overflow-y-auto pt-20 px-6 pb-8">
+          {/* Close Button */}
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-300 z-50"
+            aria-label="Close menu"
+          >
+            <i className="fas fa-times text-xl"></i>
+          </button>
+
+          {/* Mobile Search */}
+          <div className="mb-8 relative">
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 transition-colors"
+              onClick={() => { setShowSearch(true); setMobileMenuOpen(false); }}
+            />
+            <i className="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+          </div>
+
+          {/* Mobile Menu Items */}
+          <div className="space-y-2">
+            {['NEW IN', 'MEN', 'WOMEN', 'ACCESSORIES'].map((menu) => (
+              <div key={menu} className="border-b border-white/10">
+                <button
+                  onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === menu ? null : menu)}
+                  className="w-full flex items-center justify-between py-4 text-left text-sm font-black tracking-[0.2em] uppercase text-white hover:text-gray-300 transition-colors"
+                >
+                  <span>{menu}</span>
+                  <i className={`fas fa-chevron-down transition-transform duration-300 ${mobileSubmenuOpen === menu ? 'rotate-180' : ''}`}></i>
+                </button>
+                
+                {/* Mobile Submenu */}
+                <div className={`overflow-hidden transition-all duration-300 ${mobileSubmenuOpen === menu ? 'max-h-[500px] pb-4' : 'max-h-0'}`}>
+                  <div className="space-y-4 pl-4">
+                    {menuContent[menu]?.columns.map((col, idx) => (
+                      <div key={idx}>
+                        <h4 className="text-[9px] font-black text-gray-500 uppercase tracking-[0.25em] mb-2">
+                          {col.title}
+                        </h4>
+                        <ul className="space-y-2">
+                          {col.links.map((link, lIdx) => {
+                            const subcategorySlug = linkToSubcategoryMap[link.toLowerCase()] || link.toLowerCase().replace(/ /g, '-').replace(/[()]/g, '');
+                            return (
+                              <li key={lIdx}>
+                                <Link 
+                                  href={`/collections/${menu.toLowerCase().replace(/ /g, '-')}/${subcategorySlug}`}
+                                  className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+                                  onClick={() => setMobileMenuOpen(false)}
+                                >
+                                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                                  {link}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    ))}
+                    <Link 
+                      href={`/collections/${menu.toLowerCase().replace(/ /g, '-')}`}
+                      className="inline-block text-[10px] font-black uppercase tracking-widest text-red-500 border-b border-red-500 pb-0.5 hover:text-red-400 hover:border-red-400 transition-all mt-3"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      View All {menu}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile Account Link */}
+          <div className="mt-8 pt-6 border-t border-white/10">
+            <button className="w-full flex items-center gap-3 text-sm font-semibold text-white hover:text-gray-300 transition-colors py-3">
+              <i className="fas fa-user"></i>
+              <span>My Account</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Search Overlay - Dark Mode */}
       {showSearch && (
-        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md flex items-start justify-center px-2 xs:px-4 pt-14 xs:pt-16 sm:pt-20" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[99999999] bg-black/60 backdrop-blur-md flex items-start justify-center px-2 xs:px-4 pt-14 xs:pt-16 sm:pt-20" role="dialog" aria-modal="true">
           <div className="absolute inset-0" onClick={() => setShowSearch(false)}></div>
           <div className="relative w-full max-w-2xl xs:max-w-3xl bg-[#111] border border-gray-800 rounded-lg sm:rounded-xl shadow-2xl overflow-hidden animate-slide-down">
             <div className="flex items-center gap-2 xs:gap-3 px-3 xs:px-4 sm:px-6 py-2.5 xs:py-3 sm:py-4 border-b border-gray-800 bg-[#1a1a1a]">
