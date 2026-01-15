@@ -3,10 +3,8 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/admin": "pages/admin.js",
-  "/admin/products": "pages/admin/products.js",
-  "/admin/guide": "pages/admin/guide.js",
-  "/admin/orders": "pages/admin/orders.js",
-  "/api/admin/analytics": "pages/api/admin/analytics.js",
-  "/api/admin/orders": "pages/api/admin/orders.js"
+  "/product/[id]": "pages/product/[id].js",
+  "/collections/[category]/[subcategory]": "pages/collections/[category]/[subcategory].js",
+  "/api/products": "pages/api/products.js",
+  "/collections/[category]": "pages/collections/[category].js"
 }

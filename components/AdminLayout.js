@@ -22,6 +22,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }) {
     { name: 'Products', path: '/admin/products', icon: 'fa-box' },
     { name: 'Collections', path: '/admin/collections', icon: 'fa-layer-group' },
     { name: 'Orders', path: '/admin/orders', icon: 'fa-shopping-cart' },
+    { name: 'Admins', path: '/admin/admins', icon: 'fa-users-cog' },
     { name: 'Site Guide', path: '/admin/guide', icon: 'fa-book', badge: 'NEW' },
   ];
 
@@ -90,6 +91,13 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }) {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
             <div className="flex items-center gap-4">
+              <button
+                onClick={handleLogout}
+                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
+              >
+                <i className="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+              </button>
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">Admin User</p>
                 <p className="text-xs text-gray-500">admin@squatwolf.com</p>

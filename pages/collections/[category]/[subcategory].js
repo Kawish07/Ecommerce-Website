@@ -14,93 +14,8 @@ export default function CollectionPage({ products = [], category, subcategory })
     }
   }, [category, subcategory]);
 
-  // Use real products from API, fallback to dummy data if empty
-  const scrollSectionItems = products.length > 0 ? products : [
-    {
-      id: 1,
-      name: "Performance Tee",
-      price: 4500,
-      image: "https://images.pexels.com/photos/4066293/pexels-photo-4066293.jpeg?auto=compress&cs=tinysrgb&w=800",
-      desc: "Ultimate comfort fit",
-    },
-    {
-      id: 2,
-      name: "Training Shorts",
-      price: 3800,
-      image: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=800",
-      desc: "4-way stretch fabric",
-    },
-    {
-      id: 3,
-      name: "Elite Hoodie",
-      price: 7200,
-      image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=800",
-      desc: "Premium cotton blend",
-    },
-    {
-      id: 4,
-      name: "Pro Joggers",
-      price: 5000,
-      image: "https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=800",
-      desc: "Breathable mesh",
-    },
-    {
-      id: 5,
-      name: "Power Leggings",
-      price: 4800,
-      image: "https://images.pexels.com/photos/4498610/pexels-photo-4498610.jpeg?auto=compress&cs=tinysrgb&w=800",
-      desc: "High waist support",
-    },
-    {
-      id: 6,
-      name: "Active Tank",
-      price: 3200,
-      image: "https://images.pexels.com/photos/4498182/pexels-photo-4498182.jpeg?auto=compress&cs=tinysrgb&w=800",
-      desc: "Moisture wicking",
-    },
-    {
-        id: 7,
-        name: "Seamless Set",
-        price: 12000,
-        image: "https://images.pexels.com/photos/4462782/pexels-photo-4462782.jpeg?auto=compress&cs=tinysrgb&w=800",
-        desc: "Full set bundle",
-    },
-    {
-        id: 8,
-        name: "Runner Top",
-        price: 4100,
-        image: "https://images.pexels.com/photos/5580207/pexels-photo-5580207.jpeg?auto=compress&cs=tinysrgb&w=800",
-        desc: "Lightweight tech",
-    },
-    {
-        id: 9,
-        name: "Gym Bag",
-        price: 5500,
-        image: "https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=800",
-        desc: "Durable fabric",
-    },
-    {
-        id: 10,
-        name: "Sports Bra",
-        price: 2900,
-        image: "https://images.pexels.com/photos/4066288/pexels-photo-4066288.jpeg?auto=compress&cs=tinysrgb&w=800",
-        desc: "High impact support",
-    },
-    {
-        id: 11,
-        name: "Compression Leggings",
-        price: 5200,
-        image: "https://images.pexels.com/photos/4462583/pexels-photo-4462583.jpeg?auto=compress&cs=tinysrgb&w=800",
-        desc: "Squat proof",
-    },
-    {
-        id: 12,
-        name: "Stringer Vest",
-        price: 3500,
-        image: "https://images.pexels.com/photos/5412168/pexels-photo-5412168.jpeg?auto=compress&cs=tinysrgb&w=800",
-        desc: "Classic fit",
-    },
-  ];
+  // Use real products from API
+  const scrollSectionItems = products && products.length > 0 ? products : [];
 
   function formatTitle(str) {
     if (!str) return '';
@@ -146,6 +61,7 @@ export default function CollectionPage({ products = [], category, subcategory })
               {/* LEFT SIDE: Small Compact Cards Grid (9 Cols) */}
               <div className="col-span-12 lg:col-span-9">
                 {/* Grid: 4 columns on desktop for smaller cards */}
+                {scrollSectionItems && scrollSectionItems.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
                   {scrollSectionItems.map((item, index) => (
                     <div
@@ -199,13 +115,24 @@ export default function CollectionPage({ products = [], category, subcategory })
                     </div>
                   ))}
                 </div>
+                ) : (
+                  <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                      <p className="text-gray-600 text-lg mb-4">No products found in this category.</p>
+                      <Link href={`/collections/${category}`} className="text-black font-semibold hover:underline">
+                        View all {formatTitle(category)} products
+                      </Link>
+                    </div>
+                  </div>
+                )}
                 
-                {/* Pagination / Load More */}
+                {scrollSectionItems && scrollSectionItems.length > 0 && (
                 <div className="mt-16 flex justify-center">
                     <button className="px-12 py-3 border border-gray-900 text-xs font-bold tracking-widest uppercase hover:bg-black hover:text-white transition">
                         Load More
                     </button>
                 </div>
+                )}
               </div>
 
               {/* RIGHT SIDE: Sticky Sidebar (3 Cols) */}
@@ -284,19 +211,14 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const base = process.env.API_BASE_URL || 'http://localhost:3000/api';
   try {
-    const res = await fetch(`${base}/products`);
+    const res = await fetch(`${base}/products?category=${params.category}&subcategory=${params.subcategory}`);
     const contentType = res.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) throw new Error('Non-JSON response');
     const data = await res.json();
     
-    // Filter products by category and subcategory
-    const filteredProducts = (data.products || []).filter(
-      (p) => p.category === params.category && p.subcategory === params.subcategory
-    );
-    
     return {
       props: { 
-        products: filteredProducts,
+        products: data.products || [],
         category: params.category, 
         subcategory: params.subcategory 
       },

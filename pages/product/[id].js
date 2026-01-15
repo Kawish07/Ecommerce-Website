@@ -46,7 +46,7 @@ export default function ProductPage({ product, relatedProducts = [] }) {
       <Header forceSolid={true} />
       
       {/* Breadcrumb Navigation */}
-      <nav className="max-w-6xl mx-auto px-4 mt-[80px] lg:px-8 py-6 text-sm">
+      <nav className="max-w-6xl mx-auto px-4 pt-20 lg:px-8 pb-6 text-sm">
         <div className="flex items-center gap-2 text-gray-600">
           <button
             onClick={() => window.history.back()}
