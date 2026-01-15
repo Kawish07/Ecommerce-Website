@@ -18,16 +18,7 @@ export default function CartSidebar() {
   const itemCount = (cart || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   return (
-    <aside className="w-[400px] bg-black text-white h-full flex flex-col shadow-2xl">
-      {/* Header with gradient border */}
-      <div className="relative">
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"></div>
-        <div className="px-6 py-6 border-b border-gray-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-black text-xl tracking-tight uppercase">Shopping Cart</h3>
-              <p className="text-xs text-gray-400 mt-1 font-medium tracking-wide">{itemCount} {itemCount === 1 ? 'item' : 'items'} in your bag</p>
-            </div>
+    <aside className="w-full bg-black text-white h-full flex flex-col shadow-2xl">\n      {/* Header with gradient border */}\n      <div className="relative">\n        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"></div>\n        <div className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-800">\n          <div className="flex items-center justify-between">\n            <div>\n              <h3 className="font-black text-lg sm:text-xl tracking-tight uppercase">Shopping Cart</h3>\n              <p className="text-[10px] sm:text-xs text-gray-400 mt-1 font-medium tracking-wide">{itemCount} {itemCount === 1 ? 'item' : 'items'} in your bag</p>\n            </div>
             <button 
               aria-label="close cart" 
               onClick={close} 
@@ -42,22 +33,22 @@ export default function CartSidebar() {
       </div>
 
       {/* Cart Items */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 custom-scrollbar">
         {(!cart || cart.length === 0) ? (
-          <div className="h-full flex flex-col items-center justify-center text-center py-12">
-            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="h-full flex flex-col items-center justify-center text-center py-8 sm:py-12">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
-            <p className="text-gray-400 text-sm font-semibold">Your cart is empty</p>
-            <p className="text-gray-600 text-xs mt-2">Add some products to get started</p>
+            <p className="text-gray-400 text-xs sm:text-sm font-semibold">Your cart is empty</p>
+            <p className="text-gray-600 text-[10px] sm:text-xs mt-2">Add some products to get started</p>
           </div>
         ) : (
-          <ul className="space-y-4">
+          <ul className="space-y-3 sm:space-y-4">
             {cart.map((item, idx) => (
-              <li key={item.id + '-' + idx} className="group relative bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20">
-                <div className="flex gap-4">
+              <li key={item.id + '-' + idx} className="group relative bg-white/5 rounded-lg p-3 sm:p-4 hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20">
+                <div className="flex gap-3 sm:gap-4">
                   {/* Product Image */}
                   <div className="w-20 h-20 bg-gray-900 rounded-md overflow-hidden flex-shrink-0 relative">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -97,12 +88,12 @@ export default function CartSidebar() {
       </div>
 
       {/* Footer with Checkout */}
-      <div className="border-t border-gray-800 bg-gradient-to-b from-black to-gray-950 px-6 py-6">
+      <div className="border-t border-gray-800 bg-gradient-to-b from-black to-gray-950 px-4 sm:px-6 py-4 sm:py-6">
         {/* Shipping Info */}
         {cart.length > 0 && (
-          <div className="mb-4 p-3 bg-white/5 rounded-lg border border-white/10">
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-              <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-white/5 rounded-lg border border-white/10">
+            <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-400">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <span className="font-medium">Free shipping on orders over Rs 5,000</span>
@@ -111,23 +102,23 @@ export default function CartSidebar() {
         )}
 
         {/* Subtotal */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Subtotal</p>
-            <p className="text-2xl font-black text-white tracking-tight">Rs {Math.round(subtotal).toLocaleString()}</p>
+            <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Subtotal</p>
+            <p className="text-xl sm:text-2xl font-black text-white tracking-tight">Rs {Math.round(subtotal).toLocaleString()}</p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Shipping</p>
-            <p className="text-xs text-gray-400 font-semibold">Calculated at checkout</p>
+            <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-widest font-bold">Shipping</p>
+            <p className="text-[10px] sm:text-xs text-gray-400 font-semibold">Calculated at checkout</p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           <button 
             onClick={() => { if (cart.length) window.location.href = '/checkout'; }} 
             disabled={cart.length === 0}
-            className="w-full bg-white text-black px-6 py-4 text-sm font-black uppercase tracking-widest hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 rounded-lg shadow-lg hover:shadow-xl"
+            className="w-full bg-white text-black px-4 sm:px-6 py-3.5 sm:py-4 text-xs sm:text-sm font-black uppercase tracking-[0.2em] hover:bg-gray-100 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 rounded-lg shadow-lg hover:shadow-xl"
           >
             Proceed to Checkout
           </button>
@@ -135,7 +126,7 @@ export default function CartSidebar() {
           {cart.length > 0 && (
             <button 
               onClick={() => clear()} 
-              className="w-full border-2 border-white/20 text-white px-6 py-3 text-xs font-bold uppercase tracking-wider hover:bg-white/10 hover:border-white/30 transition-all duration-300 rounded-lg"
+              className="w-full border-2 border-white/20 text-white px-4 sm:px-6 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:bg-white/10 hover:border-white/30 transition-all duration-300 rounded-lg"
             >
               Clear Cart
             </button>

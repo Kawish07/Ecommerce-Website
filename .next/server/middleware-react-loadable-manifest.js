@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"_app.js -> ../components/CartSidebar\":{\"id\":\"_app.js -> ../components/CartSidebar\",\"files\":[\"static/chunks/components_CartSidebar_js.js\"]}}"

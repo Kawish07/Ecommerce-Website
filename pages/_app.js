@@ -59,7 +59,7 @@ export default function MyApp({ Component, pageProps }) {
 
       {/* Global cart overlay and sidebar (hidden by default) */}
       <div id="cart-overlay" onClick={hideCart} className="fixed inset-0 bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-200 z-40"></div>
-      <div id="cart-sidebar" className="fixed right-0 top-0 h-full w-96 transform translate-x-full transition-transform duration-200 z-50">
+      <div id="cart-sidebar" className="fixed right-0 top-0 h-full w-full sm:w-96 md:w-[480px] lg:w-[520px] transform translate-x-full transition-transform duration-200 z-50">
         <CartSidebar />
       </div>
     </CartProvider>

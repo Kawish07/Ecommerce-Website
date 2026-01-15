@@ -14,6 +14,8 @@ export default function Header({ forceSolid = false }) {
   const [catalog, setCatalog] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const searchInputRef = useRef(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(null);
 
   const searchResults = (searchQuery ? catalog.filter((p) => {
     const q = searchQuery.toLowerCase();
@@ -221,7 +223,16 @@ export default function Header({ forceSolid = false }) {
           <div className="max-w-[1600px] mx-auto px-4 lg:px-8">
             <div className={`flex items-center h-16 md:h-20 justify-between transition-all duration-500 ${solid ? 'text-white' : 'text-white'}`}>
               
-              <div className="hidden md:flex items-center space-x-8 text-[11px] font-black tracking-[0.25em] uppercase">
+              {/* Mobile Menu Toggle */}
+              <button 
+                className="md:hidden text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 text-xl z-50"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+              </button>
+
+              <div className="hidden md:flex items-center space-x-6 lg:space-x-8 text-[11px] font-black tracking-[0.25em] uppercase">
                 {['NEW IN', 'MEN', 'WOMEN', 'ACCESSORIES'].map((menu) => (
                   <div key={menu} className="relative group cursor-pointer h-full flex items-center" onMouseEnter={() => setActiveMenu(menu)}>
                     <span className={`transition-all duration-300 relative group-hover:text-gray-300 ${activeMenu === menu ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'text-white/90'}`}>
@@ -232,21 +243,21 @@ export default function Header({ forceSolid = false }) {
                 ))}
               </div>
 
-              <div className="flex-1 md:flex-none text-center">
-                <Link href="/" className="text-3xl md:text-4xl font-black tracking-tighter uppercase leading-none text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all duration-300">
-                  Squatwolf<span className="text-[10px] md:text-xs align-top ml-1 font-normal text-white/80">®</span>
+              <div className="flex-1 md:flex-none text-center md:text-left px-1 xs:px-0">
+                <Link href="/" className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter uppercase leading-none text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all duration-300">
+                  Squatwolf<span className="text-[6px] xs:text-[7px] sm:text-[9px] md:text-[10px] lg:text-xs align-top ml-0.5 font-normal text-white/80">®</span>
                 </Link>
               </div>
 
-              <div className="flex items-center space-x-6 text-base">
-                <button aria-label="search" className="text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" onClick={() => setShowSearch(true)}>
-                  <i className="fas fa-search"></i>
+              <div className="flex items-center space-x-1.5 xs:space-x-2 sm:space-x-4 md:space-x-6">
+                <button aria-label="search" className="text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] p-1 sm:p-0" onClick={() => setShowSearch(true)}>
+                  <i className="fas fa-search text-xs xs:text-sm sm:text-base"></i>
                 </button>
-                <button aria-label="account" className="text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"><i className="fas fa-user"></i></button>
-                <button aria-label="cart" className="relative text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" onClick={() => { if (typeof window !== 'undefined') { const el = document.getElementById('cart-sidebar'); if (el) el.classList.remove('translate-x-full'); const overlay = document.getElementById('cart-overlay'); if (overlay) { overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.remove('opacity-0'),10); } } }}>
-                  <i className="fas fa-shopping-bag"></i>
+                <button aria-label="account" className="text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] p-1 sm:p-0"><i className="fas fa-user text-xs xs:text-sm sm:text-base"></i></button>
+                <button aria-label="cart" className="relative text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] p-1 sm:p-0" onClick={() => { if (typeof window !== 'undefined') { const el = document.getElementById('cart-sidebar'); if (el) el.classList.remove('translate-x-full'); const overlay = document.getElementById('cart-overlay'); if (overlay) { overlay.classList.remove('hidden'); setTimeout(()=>overlay.classList.remove('opacity-0'),10); } } }}>
+                  <i className="fas fa-shopping-bag text-xs xs:text-sm sm:text-base"></i>
                   {count>0 && (
-                    <span className="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 to-red-700 text-white text-[9px] w-5 h-5 flex items-center justify-center font-black rounded-full shadow-lg shadow-red-500/50 animate-cart-bump">
+                    <span className="absolute -top-1.5 -right-1.5 xs:-top-2 xs:-right-2 bg-gradient-to-br from-red-500 to-red-700 text-white text-[7px] xs:text-[8px] sm:text-[9px] w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5 flex items-center justify-center font-black rounded-full shadow-lg shadow-red-500/50">
                       {count}
                     </span>
                   )}
@@ -256,17 +267,93 @@ export default function Header({ forceSolid = false }) {
           </div>
         </div>
 
-        {/* ================= DASHING DARK MODE MEGA MENU ================= */}
+        {/* ================= MOBILE MENU ================= */}
+        <div className={`md:hidden fixed inset-0 bg-black/95 backdrop-blur-lg z-40 transition-all duration-500 ${mobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
+          <div className="h-full overflow-y-auto pt-20 px-6 pb-8">
+            {/* Mobile Search */}
+            <div className="mb-8 relative">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 transition-colors"
+                onClick={() => { setShowSearch(true); setMobileMenuOpen(false); }}
+              />
+              <i className="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            </div>
+
+            {/* Mobile Menu Items */}
+            <div className="space-y-2">
+              {['NEW IN', 'MEN', 'WOMEN', 'ACCESSORIES'].map((menu) => (
+                <div key={menu} className="border-b border-white/10">
+                  <button
+                    onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === menu ? null : menu)}
+                    className="w-full flex items-center justify-between py-4 text-left text-sm font-black tracking-[0.2em] uppercase text-white hover:text-gray-300 transition-colors"
+                  >
+                    <span>{menu}</span>
+                    <i className={`fas fa-chevron-down transition-transform duration-300 ${mobileSubmenuOpen === menu ? 'rotate-180' : ''}`}></i>
+                  </button>
+                  
+                  {/* Mobile Submenu */}
+                  <div className={`overflow-hidden transition-all duration-300 ${mobileSubmenuOpen === menu ? 'max-h-[500px] pb-4' : 'max-h-0'}`}>
+                    <div className="space-y-4 pl-4">
+                      {menuContent[menu]?.columns.map((col, idx) => (
+                        <div key={idx}>
+                          <h4 className="text-[9px] font-black text-gray-500 uppercase tracking-[0.25em] mb-2">
+                            {col.title}
+                          </h4>
+                          <ul className="space-y-2">
+                            {col.links.map((link, lIdx) => {
+                              const subcategorySlug = linkToSubcategoryMap[link.toLowerCase()] || link.toLowerCase().replace(/ /g, '-').replace(/[()]/g, '');
+                              return (
+                                <li key={lIdx}>
+                                  <Link 
+                                    href={`/collections/${menu.toLowerCase().replace(/ /g, '-')}/${subcategorySlug}`}
+                                    className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                  >
+                                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                                    {link}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      ))}
+                      <Link 
+                        href={`/collections/${menu.toLowerCase().replace(/ /g, '-')}`}
+                        className="inline-block text-[10px] font-black uppercase tracking-widest text-red-500 border-b border-red-500 pb-0.5 hover:text-red-400 hover:border-red-400 transition-all mt-3"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        View All {menu}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile Account Link */}
+            <div className="mt-8 pt-6 border-t border-white/10">
+              <button className="w-full flex items-center gap-3 text-sm font-semibold text-white hover:text-gray-300 transition-colors py-3">
+                <i className="fas fa-user"></i>
+                <span>My Account</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ================= DASHING DARK MODE MEGA MENU (Desktop Only) ================= */}
         {activeMenu && menuContent[activeMenu] && (
           <div 
-            className="absolute top-full left-0 w-full bg-[#0a0a0a] border-t border-gray-800 z-40 animate-slide-down shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+            className="hidden md:block absolute top-full left-0 w-full bg-[#0a0a0a] border-t border-gray-800 z-40 animate-slide-down shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
             onMouseEnter={() => setActiveMenu(activeMenu)}
           >
             <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-8">
-              <div className="grid grid-cols-12 gap-10 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 
                 {/* Left: Dark Links */}
-                <div className="col-span-12 lg:col-span-4 flex flex-col justify-between pr-8">
+                <div className="lg:col-span-4 flex flex-col justify-between lg:pr-8">
                   <div className="space-y-8">
                     {menuContent[activeMenu].columns.map((col, idx) => (
                       <div key={idx}>
@@ -301,7 +388,7 @@ export default function Header({ forceSolid = false }) {
                 </div>
 
                 {/* Right: Dark Media Cards */}
-                <div className="col-span-12 lg:col-span-8 flex gap-5 h-full">
+                <div className="lg:col-span-8 flex flex-col sm:flex-row gap-5 h-full">
                   {menuContent[activeMenu].media.map((item, idx) => (
                     <Link 
                       key={idx} 
@@ -359,43 +446,43 @@ export default function Header({ forceSolid = false }) {
 
       {/* Search Overlay - Dark Mode */}
       {showSearch && (
-        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md flex items-start justify-center px-4 pt-20" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md flex items-start justify-center px-2 xs:px-4 pt-14 xs:pt-16 sm:pt-20" role="dialog" aria-modal="true">
           <div className="absolute inset-0" onClick={() => setShowSearch(false)}></div>
-          <div className="relative w-full max-w-3xl bg-[#111] border border-gray-800 rounded-xl shadow-2xl overflow-hidden animate-slide-down">
-            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-800 bg-[#1a1a1a]">
-              <i className="fas fa-search text-gray-500"></i>
+          <div className="relative w-full max-w-2xl xs:max-w-3xl bg-[#111] border border-gray-800 rounded-lg sm:rounded-xl shadow-2xl overflow-hidden animate-slide-down">
+            <div className="flex items-center gap-2 xs:gap-3 px-3 xs:px-4 sm:px-6 py-2.5 xs:py-3 sm:py-4 border-b border-gray-800 bg-[#1a1a1a]">
+              <i className="fas fa-search text-gray-500 text-xs xs:text-sm flex-shrink-0"></i>
               <input
                 ref={searchInputRef}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
-                className="flex-1 outline-none text-base font-medium placeholder-gray-600 text-white bg-transparent"
+                className="flex-1 outline-none text-xs xs:text-sm sm:text-base font-medium placeholder-gray-600 text-white bg-transparent min-w-0"
               />
-              <button onClick={() => setShowSearch(false)} className="text-xs font-bold text-gray-500 hover:text-white uppercase tracking-wide">Close</button>
+              <button onClick={() => setShowSearch(false)} className="text-[10px] xs:text-xs font-bold text-gray-500 hover:text-white uppercase tracking-wide flex-shrink-0">✕</button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 max-h-[400px] overflow-y-auto custom-scroll">
-              <div className="md:col-span-2 p-6 border-r border-gray-800">
-                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Products</h4>
-                <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 max-h-[50vh] xs:max-h-[60vh] sm:max-h-[400px] overflow-y-auto custom-scroll">
+              <div className="md:col-span-2 p-3 xs:p-4 sm:p-6 md:border-r border-gray-800">
+                <h4 className="text-[8px] xs:text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 xs:mb-3 sm:mb-4">Products</h4>
+                <div className="space-y-2 xs:space-y-3 sm:space-y-4">
                   {searchResults.map((p) => (
-                    <Link key={p.id} href={`/product/${p.id}`} className="flex gap-4 p-2 hover:bg-gray-800 rounded-lg transition-colors group">
-                      <div className="w-12 h-12 bg-gray-800 rounded-md overflow-hidden flex-shrink-0">
+                    <Link key={p.id} href={`/product/${p.id}`} className="flex gap-2 xs:gap-3 sm:gap-4 p-1.5 xs:p-2 hover:bg-gray-800 rounded-lg transition-colors group" onClick={() => setShowSearch(false)}>
+                      <div className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 bg-gray-800 rounded-md overflow-hidden flex-shrink-0">
                         <img src={p.image} alt={p.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100" />
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-white truncate group-hover:text-gray-300">{p.name}</p>
-                        <p className="text-xs text-gray-500 mt-1">Rs {Math.round(p.price || 0).toLocaleString()}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] xs:text-xs sm:text-sm font-bold text-white truncate group-hover:text-gray-300">{p.name}</p>
+                        <p className="text-[9px] xs:text-[10px] sm:text-xs text-gray-500 mt-0.5 xs:mt-1">Rs {Math.round(p.price || 0).toLocaleString()}</p>
                       </div>
                     </Link>
                   ))}
                 </div>
               </div>
-              <div className="p-6 bg-[#0d0d0d]">
-                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Categories</h4>
-                <div className="space-y-2">
-                  <Link href="/collections/men" className="block text-sm font-medium text-gray-400 hover:text-white">Men</Link>
-                  <Link href="/collections/women" className="block text-sm font-medium text-gray-400 hover:text-white">Women</Link>
-                  <Link href="/collections/accessories" className="block text-sm font-medium text-gray-400 hover:text-white">Accessories</Link>
+              <div className="p-3 xs:p-4 sm:p-6 bg-[#0d0d0d] border-t md:border-t-0 border-gray-800">
+                <h4 className="text-[8px] xs:text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 xs:mb-3 sm:mb-4">Categories</h4>
+                <div className="space-y-1.5 xs:space-y-2">
+                  <Link href="/collections/men" className="block text-[11px] xs:text-xs sm:text-sm font-medium text-gray-400 hover:text-white transition-colors" onClick={() => setShowSearch(false)}>Men</Link>
+                  <Link href="/collections/women" className="block text-[11px] xs:text-xs sm:text-sm font-medium text-gray-400 hover:text-white transition-colors" onClick={() => setShowSearch(false)}>Women</Link>
+                  <Link href="/collections/accessories" className="block text-[11px] xs:text-xs sm:text-sm font-medium text-gray-400 hover:text-white transition-colors" onClick={() => setShowSearch(false)}>Accessories</Link>
                 </div>
               </div>
             </div>
