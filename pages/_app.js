@@ -8,25 +8,24 @@ import { useEffect, useState } from 'react';
 const CartSidebar = dynamic(() => import('../components/CartSidebar'), { ssr: false });
 
 export default function MyApp({ Component, pageProps }) {
-  const router = useRouter();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
+  // Page transitions
   useEffect(() => {
-    const handleStart = () => {
+    const handleRouteChangeStart = () => {
       setIsTransitioning(true);
+      setMobileMenuOpen(false);
     };
-    const handleComplete = () => {
+    const handleRouteChangeComplete = () => {
       setIsTransitioning(false);
     };
-
-    router.events.on('routeChangeStart', handleStart);
-    router.events.on('routeChangeComplete', handleComplete);
-    router.events.on('routeChangeError', handleComplete);
-
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
     return () => {
-      router.events.off('routeChangeStart', handleStart);
-      router.events.off('routeChangeComplete', handleComplete);
-      router.events.off('routeChangeError', handleComplete);
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
     };
   }, [router]);
 

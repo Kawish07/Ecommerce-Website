@@ -225,7 +225,7 @@ export default function Header({ forceSolid = false }) {
               
               {/* Mobile Menu Toggle */}
               <button 
-                className="md:hidden text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 text-xl z-50"
+                className="md:hidden text-white hover:text-gray-300 transition-all duration-300 transform hover:scale-110 text-xl z-[1000] relative"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"
               >
@@ -268,7 +268,7 @@ export default function Header({ forceSolid = false }) {
         </div>
 
         {/* ================= MOBILE MENU ================= */}
-        <div className={`md:hidden fixed inset-0 bg-black/95 backdrop-blur-lg z-40 transition-all duration-500 ${mobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
+        <div className={`md:hidden fixed inset-0 top-0 left-0 right-0 bottom-0 bg-black/95 backdrop-blur-lg z-[999] transition-all duration-500 ${mobileMenuOpen ? 'translate-x-0 opacity-100 pointer-events-auto visible' : 'translate-x-full opacity-0 pointer-events-none invisible'}`}>
           <div className="h-full overflow-y-auto pt-20 px-6 pb-8">
             {/* Mobile Search */}
             <div className="mb-8 relative">
