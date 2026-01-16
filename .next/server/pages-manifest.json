@@ -2,8 +2,12 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/api/admin/session": "pages/api/admin/session.js",
   "/admin": "pages/admin.js",
-  "/admin/login": "pages/admin/login.js"
+  "/admin/login": "pages/admin/login.js",
+  "/": "pages/index.js",
+  "/api/products": "pages/api/products.js",
+  "/api/admin/session": "pages/api/admin/session.js",
+  "/api/admin/login": "pages/api/admin/login.js",
+  "/api/admin/analytics": "pages/api/admin/analytics.js",
+  "/api/admin/logout": "pages/api/admin/logout.js"
 }

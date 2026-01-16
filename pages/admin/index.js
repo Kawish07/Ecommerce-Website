@@ -26,7 +26,15 @@ export default function AdminDashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch('/api/admin/analytics');
+      const res = await fetch('/api/admin/analytics', { credentials: 'same-origin' });
+      if (res.status === 401) {
+        // User is not authorized, redirect to login
+        router.push('/admin/login');
+        return;
+      }
+      if (!res.ok) {
+        throw new Error(`Failed to fetch analytics: ${res.status}`);
+      }
       const data = await res.json();
       setAnalytics(data);
     } catch (error) {
