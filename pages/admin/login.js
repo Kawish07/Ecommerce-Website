@@ -39,7 +39,9 @@ export default function AdminLogin() {
 
       if (data.success) {
         console.log('Login successful, redirecting...');
-        window.location.href = '/admin';
+        // Use router.push instead of window.location.href to ensure cookie is sent
+        await new Promise(resolve => setTimeout(resolve, 500)); // Give cookie time to set
+        router.push('/admin');
       } else {
         setError(data.error || 'Login failed');
       }

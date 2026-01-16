@@ -83,7 +83,7 @@ export default async function handler(req, res) {
     }
     return res.status(401).json({ error: 'Invalid credentials' });
   } catch (error) {
-    console.error('Admin login error:', error);
-    return res.status(500).json({ error: 'Authentication failed' });
+    console.error('Admin login error:', error.message || error);
+    return res.status(500).json({ error: 'Authentication failed', details: process.env.NODE_ENV === 'development' ? error.message : undefined });
   }
 }
