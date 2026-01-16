@@ -66,6 +66,7 @@ export default async function handler(req, res) {
         });
 
         const isProd = process.env.NODE_ENV === 'production';
+        console.log(`Admin login successful for user: ${username}`);
         res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=86400${isProd ? '; Secure' : ''}`);
 
         return res.status(200).json({
@@ -81,6 +82,7 @@ export default async function handler(req, res) {
         });
       }
     }
+    console.log(`Admin login failed for user: ${username}`);
     return res.status(401).json({ error: 'Invalid credentials' });
   } catch (error) {
     console.error('Admin login error:', error.message || error);

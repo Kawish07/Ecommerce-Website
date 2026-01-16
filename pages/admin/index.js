@@ -7,22 +7,32 @@ import { format } from 'date-fns';
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState(null);
+
   useEffect(() => {
     const verify = async () => {
-      const isAuth = await checkAdminSession();
-      if (!isAuth) {
+      try {
+        const isAuth = await checkAdminSession();
+        console.log('Admin session check result:', isAuth);
+        if (!isAuth) {
+          console.log('Not authorized, redirecting to login');
+          router.replace('/admin/login');
+          return;
+        }
+        console.log('Authorized, loading analytics');
+        setAuthorized(true);
+        fetchAnalytics();
+      } catch (error) {
+        console.error('Session verification error:', error);
         router.replace('/admin/login');
-        return;
+      } finally {
+        setLoading(false);
       }
-      setAuthorized(true);
-      fetchAnalytics();
     };
     verify();
   }, [router]);
-
-  const [authorized, setAuthorized] = useState(false);
 
   const fetchAnalytics = async () => {
     try {
