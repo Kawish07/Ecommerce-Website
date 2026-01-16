@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { setAdminToken, checkAdminAuth } from '../../lib/adminAuth';
+import Link from 'next/link';
+import { checkAdminSession } from '../../lib/adminAuth';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -11,9 +12,12 @@ export default function AdminLogin() {
 
   useEffect(() => {
     // Redirect if already logged in
-    if (checkAdminAuth()) {
-      router.push('/admin');
-    }
+    const verify = async () => {
+      if (await checkAdminSession()) {
+        router.push('/admin');
+      }
+    };
+    verify();
   }, [router]);
 
   const handleSubmit = async (e) => {
@@ -34,10 +38,7 @@ export default function AdminLogin() {
       console.log('Response data:', data);
 
       if (data.success) {
-        console.log('Login successful, setting token');
-        setAdminToken(data.token);
-        console.log('Token set, redirecting...');
-        // Force redirect using window.location for immediate navigation
+        console.log('Login successful, redirecting...');
         window.location.href = '/admin';
       } else {
         setError(data.error || 'Login failed');
@@ -55,7 +56,9 @@ export default function AdminLogin() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Squatwolf Admin</h1>
+          <Link href="/" className="inline-block">
+            <h1 className="text-4xl font-bold text-white mb-2 hover:text-blue-200">Squatwolf Admin</h1>
+          </Link>
           <p className="text-gray-400">Sign in to manage your store</p>
         </div>
 
@@ -118,12 +121,6 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Default credentials:</p>
-            <p className="font-mono bg-gray-50 px-3 py-2 rounded mt-2">
-              Username: <span className="font-bold">admin</span> / Password: <span className="font-bold">admin123</span>
-            </p>
-          </div>
         </div>
 
         {/* Footer */}

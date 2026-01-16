@@ -1,4 +1,5 @@
 import { connectToDatabase } from '../../lib/mongodb';
+import { requireAdmin } from '../../lib/auth';
 
 // Comprehensive product database with unique items per category/subcategory
 const allProducts = [
@@ -97,8 +98,30 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const data = req.body;
-    const result = await db.collection('products').insertOne(data);
+    const admin = requireAdmin(req, res);
+    if (!admin) return;
+
+    const { name, price, category: cat, subcategory: subcat, image, desc } = req.body || {};
+
+    if (!name || typeof name !== 'string') {
+      return res.status(400).json({ error: 'Product name required' });
+    }
+    if (typeof price !== 'number' || price <= 0) {
+      return res.status(400).json({ error: 'Valid price required' });
+    }
+    if (!cat || typeof cat !== 'string') {
+      return res.status(400).json({ error: 'Category required' });
+    }
+
+    const result = await db.collection('products').insertOne({
+      name,
+      price,
+      category: cat,
+      subcategory: subcat,
+      image,
+      desc,
+      createdAt: new Date(),
+    });
     return res.status(201).json({ insertedId: result.insertedId });
   }
 

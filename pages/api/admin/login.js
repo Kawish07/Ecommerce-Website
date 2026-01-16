@@ -1,8 +1,6 @@
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { connectToDatabase } from '../../../lib/mongodb';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { signAdminToken } from '../../../lib/auth';
 
 // Default admin (also used to seed DB if empty)
 const DEFAULT_ADMIN = {
@@ -41,56 +39,48 @@ export default async function handler(req, res) {
 
   try {
     const { db } = await connectToDatabase();
+    const isProd = process.env.NODE_ENV === 'production';
 
-    if (db) {
-      await ensureDefaultAdmin(db);
-      const admin = await db.collection('admins').findOne({ username });
+    if (!db) {
+      if (!isProd && username === DEFAULT_ADMIN.username && password === 'admin123') {
+        const token = signAdminToken({ username, role: DEFAULT_ADMIN.role, id: 'dev-default-admin' });
+        res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=86400`);
+        return res.status(200).json({ success: true, token, user: { username, role: DEFAULT_ADMIN.role } });
+      }
+      return res.status(503).json({ error: 'Database not configured' });
+    }
 
-      if (admin) {
-        const passwordMatch = admin.passwordHash
-          ? await bcrypt.compare(password, admin.passwordHash)
-          : password === admin.password;
+    await ensureDefaultAdmin(db);
+    const admin = await db.collection('admins').findOne({ username });
 
-        if (passwordMatch) {
-          const token = jwt.sign(
-            {
-              username: admin.username,
-              role: admin.role || 'admin',
-              id: admin._id?.toString(),
-              exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
-            },
-            JWT_SECRET
-          );
+    if (admin) {
+      const passwordMatch = admin.passwordHash
+        ? await bcrypt.compare(password, admin.passwordHash)
+        : password === admin.password;
 
-          return res.status(200).json({
-            success: true,
-            token,
-            user: {
-              id: admin._id?.toString(),
-              username: admin.username,
-              role: admin.role || 'admin',
-              name: admin.name,
-              email: admin.email,
-            },
-          });
-        }
+      if (passwordMatch) {
+        const token = signAdminToken({
+          username: admin.username,
+          role: admin.role || 'admin',
+          id: admin._id?.toString(),
+        });
+
+        const isProd = process.env.NODE_ENV === 'production';
+        res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=86400${isProd ? '; Secure' : ''}`);
+
+        return res.status(200).json({
+          success: true,
+          token,
+          user: {
+            id: admin._id?.toString(),
+            username: admin.username,
+            role: admin.role || 'admin',
+            name: admin.name,
+            email: admin.email,
+          },
+        });
       }
     }
-
-    // Fallback: accept default admin without DB
-    if (username === DEFAULT_ADMIN.username && password === 'admin123') {
-      const token = jwt.sign(
-        { username, role: DEFAULT_ADMIN.role, exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60 },
-        JWT_SECRET
-      );
-
-      return res.status(200).json({
-        success: true,
-        token,
-        user: { username, role: DEFAULT_ADMIN.role },
-      });
-    }
-
     return res.status(401).json({ error: 'Invalid credentials' });
   } catch (error) {
     console.error('Admin login error:', error);

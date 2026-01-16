@@ -1,37 +1,19 @@
 import { connectToDatabase } from '../../../lib/mongodb';
+import { requireAdmin } from '../../../lib/auth';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const admin = requireAdmin(req, res);
+  if (!admin) return;
+
   try {
     const { db } = await connectToDatabase();
 
     if (!db) {
-      // Return dummy data if no database
-      return res.status(200).json({
-        totalRevenue: 2847500,
-        totalOrders: 156,
-        totalProducts: 48,
-        totalCustomers: 89,
-        recentOrders: [],
-        salesByDay: [
-          { date: '2026-01-07', sales: 125000 },
-          { date: '2026-01-08', sales: 198000 },
-          { date: '2026-01-09', sales: 156000 },
-          { date: '2026-01-10', sales: 287000 },
-          { date: '2026-01-11', sales: 234000 },
-          { date: '2026-01-12', sales: 345000 },
-          { date: '2026-01-13', sales: 412000 },
-        ],
-        topProducts: [
-          { name: 'Level Up Hoodie', sold: 34, revenue: 925000 },
-          { name: 'Power Joggers', sold: 28, revenue: 644000 },
-          { name: 'Seamless Gym Tee', sold: 45, revenue: 202500 },
-          { name: 'Flex Pro Shorts', sold: 23, revenue: 87400 },
-        ]
-      });
+      return res.status(503).json({ error: 'Database not configured' });
     }
 
     // Fetch real analytics from database

@@ -1,16 +1,32 @@
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/AdminLayout';
-import { checkAdminAuth } from '../../lib/adminAuth';
+import { checkAdminSession } from '../../lib/adminAuth';
 
 export default function SiteStructureGuide() {
   const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    if (!checkAdminAuth()) {
-      router.push('/admin/login');
-    }
+    const verify = async () => {
+      if (!(await checkAdminSession())) {
+        router.replace('/admin/login');
+        return;
+      }
+      setAuthorized(true);
+    };
+    verify();
   }, [router]);
+
+  if (!authorized) {
+    return (
+      <AdminLayout title="Site Structure Guide">
+        <div className="flex items-center justify-center h-64">
+          <i className="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   const siteStructure = [
     {

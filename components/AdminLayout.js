@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { clearAdminToken } from '../lib/adminAuth';
+import { clearAdminToken, clearAdminCookie } from '../lib/adminAuth';
 
 export default function AdminLayout({ children, title = 'Admin Dashboard' }) {
   const router = useRouter();
@@ -14,7 +14,12 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }) {
 
   const handleLogout = () => {
     clearAdminToken();
-    router.push('/admin/login');
+    clearAdminCookie();
+    fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' })
+      .catch(() => {})
+      .finally(() => {
+        window.location.href = '/admin/login';
+      });
   };
 
   const menuItems = [
@@ -36,7 +41,11 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }) {
       >
         {/* Logo */}
         <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-          {sidebarOpen && <h1 className="text-xl font-bold">Squatwolf Admin</h1>}
+          {sidebarOpen && (
+            <Link href="/" className="text-xl font-bold hover:text-blue-200">
+              Squatwolf Admin
+            </Link>
+          )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="text-gray-400 hover:text-white"

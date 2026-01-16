@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import AdminLayout from '../../components/AdminLayout';
-import { checkAdminAuth } from '../../lib/adminAuth';
+import { checkAdminSession } from '../../lib/adminAuth';
 
 export default function AdminsPage() {
   const router = useRouter();
@@ -18,12 +18,18 @@ export default function AdminsPage() {
     email: '',
   });
 
+  const [authorized, setAuthorized] = useState(false);
+
   useEffect(() => {
-    if (!checkAdminAuth()) {
-      router.push('/admin/login');
-      return;
-    }
-    fetchAdmins();
+    const verify = async () => {
+      if (!(await checkAdminSession())) {
+        router.replace('/admin/login');
+        return;
+      }
+      setAuthorized(true);
+      fetchAdmins();
+    };
+    verify();
   }, [router]);
 
   const fetchAdmins = async () => {
@@ -128,6 +134,16 @@ export default function AdminsPage() {
       admin.email?.toLowerCase().includes(search.toLowerCase())
     );
   });
+
+  if (!authorized) {
+    return (
+      <AdminLayout title="Admins Management">
+        <div className="flex items-center justify-center h-64">
+          <i className="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Admins Management">

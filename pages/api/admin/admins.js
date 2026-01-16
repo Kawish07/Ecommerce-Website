@@ -1,17 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { ObjectId } from 'mongodb';
 import { connectToDatabase } from '../../../lib/mongodb';
-
-const FALLBACK_ADMINS = [
-  {
-    _id: '1',
-    username: 'admin',
-    name: 'Default Admin',
-    email: 'admin@example.com',
-    role: 'superadmin',
-    createdAt: new Date(),
-  },
-];
+import { requireAdmin } from '../../../lib/auth';
 
 const DEFAULT_ADMIN = {
   username: 'admin',
@@ -42,14 +32,17 @@ async function ensureDefaultAdmin(db) {
 export default async function handler(req, res) {
   const { method } = req;
 
+  const admin = requireAdmin(req, res);
+  if (!admin) return;
+
   try {
     const { db } = await connectToDatabase();
 
-    if (method === 'GET') {
-      if (!db) {
-        return res.status(200).json({ admins: FALLBACK_ADMINS });
-      }
+    if (!db) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
 
+    if (method === 'GET') {
       await ensureDefaultAdmin(db);
       const admins = await db
         .collection('admins')
@@ -63,12 +56,11 @@ export default async function handler(req, res) {
     if (method === 'POST') {
       const { username, password, role = 'admin', name, email } = req.body;
 
-      if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+      if (!username || typeof username !== 'string' || username.length > 128) {
+        return res.status(400).json({ error: 'Valid username is required' });
       }
-
-      if (!db) {
-        return res.status(201).json({ success: true, admin: { ...FALLBACK_ADMINS[0], username, role, name, email } });
+      if (!password || typeof password !== 'string' || password.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters' });
       }
 
       const existing = await db.collection('admins').findOne({ username });
@@ -97,10 +89,6 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Admin ID is required' });
       }
 
-      if (!db) {
-        return res.status(200).json({ success: true });
-      }
-
       let adminId;
       try {
         adminId = new ObjectId(id);
@@ -121,6 +109,9 @@ export default async function handler(req, res) {
       if (name !== undefined) update.name = name;
       if (email !== undefined) update.email = email;
       if (password) {
+        if (password.length < 8) {
+          return res.status(400).json({ error: 'Password must be at least 8 characters' });
+        }
         update.passwordHash = await bcrypt.hash(password, 10);
       }
 
@@ -133,10 +124,6 @@ export default async function handler(req, res) {
 
       if (!id) {
         return res.status(400).json({ error: 'Admin ID is required' });
-      }
-
-      if (!db) {
-        return res.status(200).json({ success: true });
       }
 
       let adminId;

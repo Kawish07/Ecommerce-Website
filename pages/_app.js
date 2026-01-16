@@ -1,6 +1,5 @@
 import '../styles/globals.css';
 import { CartProvider } from '../context/CartContext';
-import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -43,15 +42,6 @@ export default function MyApp({ Component, pageProps }) {
 
   return (
     <CartProvider>
-      <Head>
-        <title>Squatwolf - Premium Activewear & Gym Clothing</title>
-        <meta name="description" content="Shop the best activewear and gym clothing for men and women. Premium quality workout gear designed for peak performance." />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="" crossOrigin="anonymous" />
-      </Head>
-
       <div className={`page-transition ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
         <Component {...pageProps} />
       </div>

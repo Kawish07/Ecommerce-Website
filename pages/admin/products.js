@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import AdminLayout from '../../components/AdminLayout';
-import { checkAdminAuth } from '../../lib/adminAuth';
+import { checkAdminSession } from '../../lib/adminAuth';
 
 export default function ProductsManagement() {
   const router = useRouter();
@@ -24,13 +24,19 @@ export default function ProductsManagement() {
     tag: '',
   });
 
+  const [authorized, setAuthorized] = useState(false);
+
   useEffect(() => {
-    if (!checkAdminAuth()) {
-      router.push('/admin/login');
-      return;
-    }
-    fetchProducts();
-    fetchCollections();
+    const verify = async () => {
+      if (!(await checkAdminSession())) {
+        router.replace('/admin/login');
+        return;
+      }
+      setAuthorized(true);
+      fetchProducts();
+      fetchCollections();
+    };
+    verify();
   }, [router]);
 
   const fetchProducts = async () => {
@@ -148,6 +154,16 @@ export default function ProductsManagement() {
       p.description?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  if (!authorized) {
+    return (
+      <AdminLayout title="Products Management">
+        <div className="flex items-center justify-center h-64">
+          <i className="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Products Management">

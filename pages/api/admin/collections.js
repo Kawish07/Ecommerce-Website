@@ -1,18 +1,18 @@
+import { ObjectId } from 'mongodb';
 import { connectToDatabase } from '../../../lib/mongodb';
+import { requireAdmin } from '../../../lib/auth';
 
 export default async function handler(req, res) {
+  const admin = requireAdmin(req, res);
+  if (!admin) return;
+
   const { db } = await connectToDatabase();
+  if (!db) {
+    return res.status(503).json({ error: 'Database not configured' });
+  }
 
   if (req.method === 'GET') {
     try {
-      if (!db) {
-        return res.status(200).json({ collections: [
-          { _id: '1', name: 'Men', slug: 'men', description: 'Men\'s collection', productCount: 24 },
-          { _id: '2', name: 'Women', slug: 'women', description: 'Women\'s collection', productCount: 18 },
-          { _id: '3', name: 'Accessories', slug: 'accessories', description: 'Accessories', productCount: 6 },
-        ]});
-      }
-
       const collections = await db.collection('collections').find({}).toArray();
       return res.status(200).json({ collections });
     } catch (error) {
@@ -26,10 +26,6 @@ export default async function handler(req, res) {
 
       if (!name || !slug) {
         return res.status(400).json({ error: 'Name and slug required' });
-      }
-
-      if (!db) {
-        return res.status(200).json({ success: true, collection: { _id: Date.now().toString(), ...req.body } });
       }
 
       const result = await db.collection('collections').insertOne({
@@ -54,12 +50,15 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'ID, name, and slug required' });
       }
 
-      if (!db) {
-        return res.status(200).json({ success: true });
+      let collectionId;
+      try {
+        collectionId = new ObjectId(id);
+      } catch (error) {
+        return res.status(400).json({ error: 'Invalid collection ID' });
       }
 
       await db.collection('collections').updateOne(
-        { _id: id },
+        { _id: collectionId },
         { $set: { name, slug, description, image, updatedAt: new Date() } }
       );
 
@@ -77,11 +76,14 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'ID required' });
       }
 
-      if (!db) {
-        return res.status(200).json({ success: true });
+      let collectionId;
+      try {
+        collectionId = new ObjectId(id);
+      } catch (error) {
+        return res.status(400).json({ error: 'Invalid collection ID' });
       }
 
-      await db.collection('collections').deleteOne({ _id: id });
+      await db.collection('collections').deleteOne({ _id: collectionId });
       return res.status(200).json({ success: true });
     } catch (error) {
       return res.status(500).json({ error: 'Failed to delete collection' });

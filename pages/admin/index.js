@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import AdminLayout from '../../components/AdminLayout';
-import { checkAdminAuth, getAdminToken } from '../../lib/adminAuth';
+import { checkAdminSession } from '../../lib/adminAuth';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
 
@@ -9,32 +9,24 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState(null);
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    const verify = async () => {
+      const isAuth = await checkAdminSession();
+      if (!isAuth) {
+        router.replace('/admin/login');
+        return;
+      }
+      setAuthorized(true);
+      fetchAnalytics();
+    };
+    verify();
+  }, [router]);
 
-  useEffect(() => {
-    if (!mounted) return;
-    
-    const isAuth = checkAdminAuth();
-    console.log('Auth check:', isAuth);
-    
-    if (!isAuth) {
-      router.push('/admin/login');
-      return;
-    }
-    fetchAnalytics();
-  }, [router, mounted]);
+  const [authorized, setAuthorized] = useState(false);
 
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch('/api/admin/analytics', {
-        headers: {
-          Authorization: `Bearer ${getAdminToken()}`,
-        },
-      });
+      const res = await fetch('/api/admin/analytics');
       const data = await res.json();
       setAnalytics(data);
     } catch (error) {
@@ -44,7 +36,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) {
+  if (!authorized || loading) {
     return (
       <AdminLayout title="Dashboard">
         <div className="flex items-center justify-center h-64">

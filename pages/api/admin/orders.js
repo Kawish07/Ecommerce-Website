@@ -1,37 +1,18 @@
+import { ObjectId } from 'mongodb';
 import { connectToDatabase } from '../../../lib/mongodb';
+import { requireAdmin } from '../../../lib/auth';
 
 export default async function handler(req, res) {
+  const admin = requireAdmin(req, res);
+  if (!admin) return;
+
   const { db } = await connectToDatabase();
+  if (!db) {
+    return res.status(503).json({ error: 'Database not configured' });
+  }
 
   if (req.method === 'GET') {
     try {
-      if (!db) {
-        // Return dummy data if no database
-        return res.status(200).json({
-          orders: [
-            {
-              _id: '1',
-              shippingAddress: {
-                firstName: 'John',
-                lastName: 'Doe',
-                email: 'john@example.com',
-                phone: '+92 300 1234567',
-                address: '123 Main St',
-                city: 'Karachi',
-                country: 'Pakistan',
-                postalCode: '75500'
-              },
-              items: [
-                { name: 'Level Up Hoodie', price: 27200, quantity: 1, image: 'https://images.pexels.com/photos/3755706/pexels-photo-3755706.jpeg' }
-              ],
-              paymentMethod: 'Cash on Delivery',
-              status: 'pending',
-              createdAt: new Date()
-            }
-          ]
-        });
-      }
-
       const orders = await db.collection('orders').find({}).sort({ createdAt: -1 }).toArray();
       return res.status(200).json({ orders });
     } catch (error) {
@@ -48,12 +29,15 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Order ID and status required' });
       }
 
-      if (!db) {
-        return res.status(200).json({ success: true });
+      let id;
+      try {
+        id = new ObjectId(orderId);
+      } catch (error) {
+        return res.status(400).json({ error: 'Invalid order ID' });
       }
 
       await db.collection('orders').updateOne(
-        { _id: orderId },
+        { _id: id },
         { $set: { status, updatedAt: new Date() } }
       );
 

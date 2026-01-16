@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import AdminLayout from '../../components/AdminLayout';
-import { checkAdminAuth } from '../../lib/adminAuth';
+import { checkAdminSession } from '../../lib/adminAuth';
 import { format } from 'date-fns';
 
 export default function OrdersManagement() {
@@ -11,12 +11,18 @@ export default function OrdersManagement() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
 
+  const [authorized, setAuthorized] = useState(false);
+
   useEffect(() => {
-    if (!checkAdminAuth()) {
-      router.push('/admin/login');
-      return;
-    }
-    fetchOrders();
+    const verify = async () => {
+      if (!(await checkAdminSession())) {
+        router.replace('/admin/login');
+        return;
+      }
+      setAuthorized(true);
+      fetchOrders();
+    };
+    verify();
   }, [router]);
 
   const fetchOrders = async () => {
@@ -70,6 +76,16 @@ export default function OrdersManagement() {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (!authorized) {
+    return (
+      <AdminLayout title="Orders Management">
+        <div className="flex items-center justify-center h-64">
+          <i className="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Orders Management">
