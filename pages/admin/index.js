@@ -11,7 +11,24 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState(null);
 
+  const fetchAnalytics = async () => {
+    try {
+      const res = await fetch('/api/admin/analytics', { credentials: 'same-origin' });
+      if (!res.ok) {
+        console.error(`Failed to fetch analytics: ${res.status}`);
+        setAnalytics(null);
+        return;
+      }
+      const data = await res.json();
+      setAnalytics(data);
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+      setAnalytics(null);
+    }
+  };
+
   useEffect(() => {
+    let isMounted = true;
     const verify = async () => {
       try {
         const isAuth = await checkAdminSession();
@@ -21,38 +38,22 @@ export default function AdminDashboard() {
           router.replace('/admin/login');
           return;
         }
-        console.log('Authorized, loading analytics');
-        setAuthorized(true);
-        fetchAnalytics();
+        if (isMounted) {
+          console.log('Authorized, loading analytics');
+          setAuthorized(true);
+          setLoading(false);
+          fetchAnalytics();
+        }
       } catch (error) {
         console.error('Session verification error:', error);
-        router.replace('/admin/login');
-      } finally {
-        setLoading(false);
+        if (isMounted) {
+          router.replace('/admin/login');
+        }
       }
     };
     verify();
-  }, [router]);
-
-  const fetchAnalytics = async () => {
-    try {
-      const res = await fetch('/api/admin/analytics', { credentials: 'same-origin' });
-      if (res.status === 401) {
-        // User is not authorized, redirect to login
-        router.push('/admin/login');
-        return;
-      }
-      if (!res.ok) {
-        throw new Error(`Failed to fetch analytics: ${res.status}`);
-      }
-      const data = await res.json();
-      setAnalytics(data);
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => { isMounted = false; };
+  }, []);
 
   if (!authorized || loading) {
     return (

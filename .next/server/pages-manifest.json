@@ -3,11 +3,11 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/admin/login": "pages/admin/login.js",
-  "/": "pages/index.js",
   "/api/admin/session": "pages/api/admin/session.js",
-  "/api/admin/login": "pages/api/admin/login.js",
+  "/": "pages/index.js",
   "/api/products": "pages/api/products.js",
   "/api/admin/analytics": "pages/api/admin/analytics.js",
   "/admin": "pages/admin.js",
+  "/api/admin/login": "pages/api/admin/login.js",
   "/api/admin/logout": "pages/api/admin/logout.js"
 }

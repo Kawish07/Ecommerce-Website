@@ -1,13 +1,18 @@
 import { connectToDatabase } from '../../../lib/mongodb';
-import { requireAdmin } from '../../../lib/auth';
+import { verifyAdminRequest } from '../../../lib/auth';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const admin = requireAdmin(req, res);
-  if (!admin) return;
+  const admin = verifyAdminRequest(req);
+  if (!admin) {
+    console.log('Analytics: Admin verification failed');
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  console.log('Analytics: Admin verified -', admin.username);
 
   try {
     const { db } = await connectToDatabase();
