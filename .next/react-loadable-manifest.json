@@ -1,6 +1,6 @@
 {
-  "_app.js -> ../components/CartSidebar": {
-    "id": "_app.js -> ../components/CartSidebar",
+  "pages\\_app.js -> ../components/CartSidebar": {
+    "id": "pages\\_app.js -> ../components/CartSidebar",
     "files": [
       "static/chunks/components_CartSidebar_js.js"
     ]

@@ -2,7 +2,11 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/collections/[category]": "pages/collections/[category].js",
+  "/admin/login": "pages/admin/login.js",
+  "/": "pages/index.js",
+  "/api/admin/session": "pages/api/admin/session.js",
   "/api/products": "pages/api/products.js",
-  "/": "pages/index.js"
+  "/api/admin/login": "pages/api/admin/login.js",
+  "/api/admin/analytics": "pages/api/admin/analytics.js",
+  "/admin": "pages/admin.js"
 }
