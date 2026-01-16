@@ -12,14 +12,18 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }) {
     setCurrentPath(router.pathname);
   }, [router.pathname]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     clearAdminToken();
     clearAdminCookie();
-    fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' })
-      .catch(() => {})
-      .finally(() => {
-        window.location.href = '/admin/login';
-      });
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Give the server time to set the cookie expiration
+      await new Promise(resolve => setTimeout(resolve, 500));
+      window.location.href = '/admin/login';
+    }
   };
 
   const menuItems = [
